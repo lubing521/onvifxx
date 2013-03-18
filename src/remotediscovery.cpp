@@ -6,6 +6,16 @@ namespace onvif {
 
 struct RemoteDiscoveryImpl : RemoteDiscoveryBindingProxy, RemoteDiscovery
 {
+    virtual ResolveType Hello(HelloType hello)
+    {
+        ns22__HelloType * ht = 0;
+        ns22__ResolveType * rt = 0;
+
+        int n = RemoteDiscoveryBindingProxy::Hello(ht,  rt);
+        if (n == 0)
+            throw std::exception();
+        return ResolveType();
+    }
 
 };
 
