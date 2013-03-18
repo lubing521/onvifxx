@@ -1,0 +1,4 @@
+mkdir onvifcxx-buid
+cd onvifcxx-buid
+cmake onvifcxx
+make && make install
