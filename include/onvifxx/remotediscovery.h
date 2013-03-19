@@ -13,9 +13,10 @@ public:
     virtual ResolveType Hello(HelloType hello);
     virtual ResolveType Bye(ByeType  bye);
 
-    static RemoteDiscovery * create();
+    static RemoteDiscovery * client();
+    static RemoteDiscovery * server();
 
-private:
+protected:
     RemoteDiscovery();
 };
 

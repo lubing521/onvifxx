@@ -1,10 +1,12 @@
-#include <onvif/remotediscovery.h>
+#include <onvifxx/remotediscovery.h>
 
 
 int main(int argc, char ** argv)
 {
-    onvif::RemoteDiscovery * rd = onvif::RemoteDiscovery::create();
-    delete rd;
+    onvif::RemoteDiscovery * client = onvif::RemoteDiscovery::client();
+    onvif::RemoteDiscovery * server = onvif::RemoteDiscovery::server();
+    delete client;
+    delete server;
 }
 
 

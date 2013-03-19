@@ -16,6 +16,6 @@ wsdl_list=$(ls *.wsdl | tr "\n" " " | sed s/rw-2.wsdl// | sed s/bw-2.wsdl//)
 
 mkdir src
 wsdl2h -o ns1.h ws-addr.xsd
-wsdl2h -o /dev/stdout $wsdl_list 2>/dev/null | soapcpp2 -inxCL -f100 -dsrc
+wsdl2h -o /dev/stdout $wsdl_list 2>/dev/null | soapcpp2 -inxL -f100 -dsrc
 
 sed -i 's/soap_namespaces/namespaces/' src/soap.nsmap
