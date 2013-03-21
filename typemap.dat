@@ -1,5 +1,5 @@
-# Written by: Stanislav Shikhalev <stas@sigrnad.com>
-# Copyright: Sigrand LLC
+# Written by Stanislav Shikhalev <stas@sigrnad.com>
+# Copyright (C) 2013 Sigrand LLC <sigrand.com>
 
 wsa5    = <http://www.w3.org/2005/08/addressing>
 xop     = <http://www.w3.org/2004/08/xop/include>
