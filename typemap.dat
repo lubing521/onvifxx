@@ -1,0 +1,55 @@
+wsa5    = <http://www.w3.org/2005/08/addressing>
+xop     = <http://www.w3.org/2004/08/xop/include>
+
+wsa     = "http://schemas.xmlsoap.org/ws/2004/08/addressing"
+wsdd    = "http://schemas.xmlsoap.org/ws/2005/04/discovery"
+
+onvif   = "http://www.onvif.org/ver10/schema"
+wsnt    = "http://docs.oasis-open.org/wsn/b-2"
+wsrf    = "http://docs.oasis-open.org/wsrf/bf-2"
+wsrf-r  = "http://docs.oasis-open.org/wsrf/r-2"
+wsrf-bf = "http://docs.oasis-open.org/wsrf/bf-2"
+wstop   = "http://docs.oasis-open.org/wsn/t-1"
+
+tad     = "http://www.onvif.org/ver10/analyticsdevice/wsdl"
+tae     = "http://www.onvif.org/ver10/actionengine/wsdl"
+tds     = "http://www.onvif.org/ver10/device/wsdl"
+timg    = "http://www.onvif.org/ver20/imaging/wsdl"
+tls     = "http://www.onvif.org/ver10/display/wsdl"
+tmd     = "http://www.onvif.org/ver10/deviceIO/wsdl"
+tptz    = "http://www.onvif.org/ver20/ptz/wsdl"
+trc     = "http://www.onvif.org/ver10/recording/wsdl"
+trp     = "http://www.onvif.org/ver10/replay/wsdl"
+trt     = "http://www.onvif.org/ver10/media/wsdl"
+trv     = "http://www.onvif.org/ver10/receiver/wsdl"
+tse     = "http://www.onvif.org/ver10/search/wsdl"
+
+
+tan     = "http://www.onvif.org/ver20/analytics/wsdl"
+tan-re  = "http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
+tan-ae  = "http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
+
+tev     = "http://www.onvif.org/ver10/events/wsdl"
+tev-e   = "http://www.onvif.org/ver10/events/wsdl/EventBinding"
+tev-sm  = "http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
+tev-np  = "http://www.onvif.org/ver10/events/wsdl/NotificationProducerBinding"
+tev-nc  = "http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding"
+tev-pp  = "http://www.onvif.org/ver10/events/wsdl/PullPointBinding"
+tev-pps = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
+tev-cpp = "http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
+tev-psm = "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
+
+dn      = "http://www.onvif.org/ver10/network/wsdl"
+dn-rd   = "http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
+dn-dl   = "http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
+
+
+
+
+
+
+
+
+
+
+

@@ -1,25 +1,27 @@
 #ifndef ONVIF_REMOTEDICOVERY_H
 #define ONVIF_REMOTEDICOVERY_H
 
-namespace onvif {
+#include <memory>
 
-class RemoteDiscovery
+namespace onvifxx {
+
+template<class T>
+T * createProxy();
+
+template<class T>
+T * createService();
+
+struct HelloType { };
+struct ByeType { };
+struct ResolveType { };
+
+struct RemoteDiscovery
 {
-public:
-    struct HelloType { };
-    struct ByeType { };
-    struct ResolveType { };
-
-    virtual ResolveType Hello(HelloType hello);
-    virtual ResolveType Bye(ByeType  bye);
-
-    static RemoteDiscovery * client();
-    static RemoteDiscovery * server();
-
-protected:
-    RemoteDiscovery();
+    virtual ResolveType hello(HelloType hello) = 0;
+    virtual ResolveType bye(ByeType bye) = 0;
 };
 
-} // namespace onvif
+
+} // namespace onvifxx
 
 #endif // ONVIF_REMOTEDICOVERY_H
