@@ -1,9 +1,9 @@
-#include <onvifxx/media.h>
-#include <soapMediaBindingService.h>
+#include <onvifxx/media.hpp>
+#include <onvifMediaBindingService.h>
 
 namespace onvifxx {
 
-struct MediaService : Media
+struct MediaServer : Media
 {
 };
 

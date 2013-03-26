@@ -1,21 +1,23 @@
-#include <onvifxx/media.h>
-#include <soapMediaBindingProxy.h>
+#include <onvifxx/media.hpp>
+#include <onvifMediaBindingProxy.h>
 
 namespace onvifxx {
 
-struct MediaProxy
+struct MediaClient : MediaBindingProxy, Media
 {
+    virtual	Capabilities getServiceCapabilities()
+    {
+        int result = MediaBindingProxy::GetServiceCapabilities(0, 0);
+        if (result != SOAP_OK)
+            throw std::exception();
 
+        return Capabilities();
+    }
 };
 
-
-//template<>
-//Media * createProxy<Media>()
-//{
-//    return new MediaProxy;
-//}
-
-
+Media * createMediaClient()
+{
+    return new MediaClient;
+}
 
 } // namespace onvifxx
-
