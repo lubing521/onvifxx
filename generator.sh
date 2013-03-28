@@ -11,10 +11,17 @@ do
 done
 
 wsdl_list=$(ls *.wsdl | tr "\n" " " | sed s/rw-2.wsdl// | sed s/bw-2.wsdl//)
-src_type=
+echo $wsdl_list
+#wsdl_list="${wsdl_list}"
 
 mkdir src
-wsdl2h -o /dev/stdout -t $(dirname $0)/typemap.dat \
-		$wsdl_list 2>/dev/null | soapcpp2 -I /usr/share/gsoap/import -inxL$1 -ponvif -f100 -dsrc
+ln -s /usr/share/gsoap/import/stlvector.h stlvector.h
+ln -s /usr/share/gsoap/import/xop.h xop.h
+ln -s /usr/share/gsoap/import/wsdd10.h wsdd.h
+ln -s /usr/share/gsoap/import/wsdx.h wsdx.h
+ln -s /usr/share/gsoap/import/wsa.h wsa.h
+
+wsdl2h -xP -o /dev/stdout -t $(dirname $0)/typemap.dat \
+		${wsdl_list} 2>/dev/null | soapcpp2  -inxL$1 -ponvif -f100 -dsrc
 sed -i 's/onvif_namespaces/namespaces/' src/onvif.nsmap
 

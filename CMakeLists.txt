@@ -18,8 +18,6 @@ set(GSOAP_DIR ${PROJECT_BINARY_DIR}/gsoap)
 file(MAKE_DIRECTORY ${GSOAP_DIR})
 
 aux_source_directory(${GSOAP_DIR}/src GSOAP_SOURCES)
-aux_source_directory(${PROJECT_SOURCE_DIR}/src SOURCES)
-
 if(NOT "${GSOAP_SOURCES}")
 	if(ONLY_SERVER)
 		set(GENERATOR_OPTION "S")
@@ -41,14 +39,19 @@ if(NOT "${GSOAP_SOURCES}")
 	aux_source_directory(${GSOAP_DIR}/src GSOAP_SOURCES)
 endif(NOT "${GSOAP_SOURCES}")
 
-file(GLOB XML_LIST xml/*.*)
+add_subdirectory(wsdd)
+
+file(GLOB XML_FILES xml/*.*)
+file(GLOB_RECURSE HEADERS  ${PROJECT_SOURCE_DIR}/include/*.hpp)
+file(GLOB GSOAP_HEADERS ${GSOAP_DIR}/src/*.h)
+aux_source_directory(${PROJECT_SOURCE_DIR}/src SOURCES)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${GSOAP_DIR}/src)
 
 add_definitions(-DWITH_PURE_VIRTUAL)
-add_library(${PROJECT_NAME} STATIC
-	${SOURCES} ${GSOAP_SOURCES} ${XML_LIST}
+add_library(${PROJECT_NAME} SHARED
+	${SOURCES} ${HEADERS} ${GSOAP_SOURCES} ${GSOAP_HEADERS} ${XML_FILES}
 	generator.sh typemap.dat
 )
 target_link_libraries(${PROJECT_NAME} gsoap++)

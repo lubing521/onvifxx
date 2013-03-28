@@ -2,6 +2,11 @@
 
 namespace onvifxx {
 
+DiscoveryServer::DiscoveryServer()
+{
+
+}
+
 RemoteDiscovery::ResolveType DiscoveryServer::hello(RemoteDiscovery::HelloType arg)
 {
     return RemoteDiscovery::ResolveType();

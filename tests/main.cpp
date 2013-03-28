@@ -1,5 +1,5 @@
 #include <onvifxx/discovery.hpp>
-#include <onvifxx/media.hpp>
+//#include <onvifxx/media.hpp>
 
 struct DiscoveryService : onvifxx::DiscoveryServer
 {
@@ -22,12 +22,13 @@ struct DiscoveryService : onvifxx::DiscoveryServer
 
 int main(int argc, char ** argv)
 {
-    DiscoveryService service;
-    onvifxx::DiscoveryClient client;
+    //DiscoveryService ds;
+    onvifxx::DiscoveryClient dc;
+    dc.probe(onvifxx::DiscoveryLookup::ProbeType());
 
-    auto m = onvifxx::createMediaClient();
-    m->getServiceCapabilities();
-    delete m;
+//    auto m = onvifxx::createMediaClient();
+//    m->getServiceCapabilities();
+//    delete m;
 
     return 0;
 }

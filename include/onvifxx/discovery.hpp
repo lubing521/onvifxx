@@ -1,5 +1,5 @@
-#ifndef ONVIF_REMOTEDICOVERY_H
-#define ONVIF_REMOTEDICOVERY_H
+#ifndef ONVIF_DICOVERY_H
+#define ONVIF_DICOVERY_H
 
 #include "onvifxx.hpp"
 
@@ -28,12 +28,17 @@ class DiscoveryClient :
         public DiscoveryLookup
 {
 public:
+    DiscoveryClient();
+
     virtual ProbeMatchesType probe(ProbeType arg);
 
 protected:
     virtual ResolveType hello(HelloType arg);
     virtual ResolveType bye(ByeType arg);
 
+private:
+    struct Impl;
+    std::shared_ptr<Impl> impl_;
 };
 
 class DiscoveryServer :
@@ -41,13 +46,19 @@ class DiscoveryServer :
         protected DiscoveryLookup
 {
 public:
+    DiscoveryServer();
+
     virtual ResolveType hello(HelloType arg);
     virtual ResolveType bye(ByeType arg);
 
 protected:
     virtual ProbeMatchesType probe(ProbeType arg);
+
+private:
+    struct Impl;
+    std::shared_ptr<Impl> impl_;
 };
 
 } // namespace onvifxx
 
-#endif // ONVIF_REMOTEDICOVERY_H
+#endif // ONVIF_DICOVERY_H

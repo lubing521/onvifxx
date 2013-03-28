@@ -1,18 +1,19 @@
-# Written by Stanislav Shikhalev <stas@sigrnad.com>
+# Written by Stanislav Shikhalev <stas@sigrand.com>
 # Copyright (C) 2013 Sigrand LLC <sigrand.com>
 
 xop     = <http://www.w3.org/2004/08/xop/include>
-wsa     = "http://www.w3.org/2005/08/addressing"
+wsa     = <http://www.w3.org/2005/08/addressing>
 
-d       = "http://schemas.xmlsoap.org/ws/2005/04/discovery"
-soapenv	= "http://schemas.xmlsoap.org/soap/envelope/"
+#	OASIS recommended prefixes
+wsnt	= "http://docs.oasis-open.org/wsn/b-2"
+wsntw	= "http://docs.oasis-open.org/wsn/bw-2"
+wsrfbf	= "http://docs.oasis-open.org/wsrf/bf-2"
+wsrfr	= "http://docs.oasis-open.org/wsrf/r-2"
+wsrfrw  = "http://docs.oasis-open.org/wsrf/rw-2"
+wstop	= "http://docs.oasis-open.org/wsn/t-1"
 
-wsnt    = "http://docs.oasis-open.org/wsn/b-2"
-wsrf    = "http://docs.oasis-open.org/wsrf/bf-2"
-wsrf-r  = "http://docs.oasis-open.org/wsrf/r-2"
-wsrf-bf = "http://docs.oasis-open.org/wsrf/bf-2"
-wstop   = "http://docs.oasis-open.org/wsn/t-1"
 
+#   ONVIF recommended prefixes
 tt      = "http://www.onvif.org/ver10/schema"
 tad     = "http://www.onvif.org/ver10/analyticsdevice/wsdl"
 tae     = "http://www.onvif.org/ver10/actionengine/wsdl"
@@ -26,22 +27,38 @@ trp     = "http://www.onvif.org/ver10/replay/wsdl"
 trt     = "http://www.onvif.org/ver10/media/wsdl"
 trv     = "http://www.onvif.org/ver10/receiver/wsdl"
 tse     = "http://www.onvif.org/ver10/search/wsdl"
-
-
 tan     = "http://www.onvif.org/ver20/analytics/wsdl"
-tan-re  = "http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
-tan-ae  = "http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
-
+tanre   = "http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
+tanae   = "http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
 tev     = "http://www.onvif.org/ver10/events/wsdl"
-tev-e   = "http://www.onvif.org/ver10/events/wsdl/EventBinding"
-tev-sm  = "http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
-tev-np  = "http://www.onvif.org/ver10/events/wsdl/NotificationProducerBinding"
-tev-nc  = "http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding"
-tev-pp  = "http://www.onvif.org/ver10/events/wsdl/PullPointBinding"
-tev-pps = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
-tev-cpp = "http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
-tev-psm = "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
+teve    = "http://www.onvif.org/ver10/events/wsdl/EventBinding"
+tevsm   = "http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
+tevnp   = "http://www.onvif.org/ver10/events/wsdl/NotificationProducerBinding"
+tevnc   = "http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding"
+tevpp   = "http://www.onvif.org/ver10/events/wsdl/PullPointBinding"
+tevpps  = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
+tevcpp  = "http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
+tevpsm  = "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
 
-dn      = "http://www.onvif.org/ver10/network/wsdl"
-dn-rd   = "http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
-dn-dl   = "http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
+#dn      = "http://www.onvif.org/ver10/network/wsdl"
+#dnrd    = "http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
+#dndl    = "http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
+
+#	WS-Discovery 1.0 remapping
+# wsdd10__HelloType		= | wsdd__HelloType
+# wsdd10__ByeType			= | wsdd__ByeType
+# wsdd10__ProbeType		= | wsdd__ProbeType
+# wsdd10__ProbeMatchesType	= | wsdd__ProbeMatchesType
+# wsdd10__ProbeMatchType		= | wsdd__ProbeMatchType
+# wsdd10__ResolveType		= | wsdd__ResolveType
+# wsdd10__ResolveMatchesType	= | wsdd__ResolveMatchesType
+# wsdd10__ResolveMatchType	= | wsdd__ResolveMatchType
+#	SOAP-ENV mapping
+# SOAP_ENV__Envelope	= struct SOAP_ENV__Envelope { struct SOAP_ENV__Header *SOAP_ENV__Header; _XML SOAP_ENV__Body; }; | struct SOAP_ENV__Envelope
+# SOAP_ENV__Header	= | struct SOAP_ENV__Header
+# SOAP_ENV__Fault		= | struct SOAP_ENV__Fault
+# SOAP_ENV__Detail	= | struct SOAP_ENV__Detail
+# SOAP_ENV__Code		= | struct SOAP_ENV__Code
+# SOAP_ENV__Subcode	= | struct SOAP_ENV__Subcode
+# SOAP_ENV__Reason	= | struct SOAP_ENV__Reason
+
