@@ -1,5 +1,5 @@
 #include <onvifxx/media.hpp>
-#include <onvifMediaBindingService.h>
+//#include <onvifMediaBindingService.h>
 
 namespace onvifxx {
 

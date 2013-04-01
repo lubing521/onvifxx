@@ -1,7 +1,7 @@
 /*
-	wsaapi.c
+    wsaapi.c
 
-	WS-Addressing plugin.
+    WS-Addressing plugin.
 
 gSOAP XML Web services tools
 Copyright (C) 2000-2008, Robert van Engelen, Genivia Inc., All Rights Reserved.
@@ -157,7 +157,7 @@ if (soap_wsa_request(soap, RequestMessageID, ToAddress, RequestAction))
 if (soap_call_ns__example(soap, ToAddress, NULL, ...))
   soap_print_fault(soap, stderr); // an error occurred
 else
-  // process the response 
+  // process the response
 @endcode
 
 To generate a UUID for the RequestMessageID, use:
@@ -224,7 +224,7 @@ if (soap_call_ns__example(soap, ToAddress, NULL, ...))
     soap_print_fault(soap, stderr); // a connection error occurred
 }
 else
-  // process response 
+  // process response
 @endcode
 
 Note that the call can still return a fault, such as a connection error when
@@ -244,7 +244,7 @@ if (soap_call_ns__example(soap, ToAddress, NULL, ...))
     soap_print_fault(soap, stderr); // a connection error occurred
 }
 else
-  // process response 
+  // process response
 @endcode
 
 When a WS-Addressing error occurred, the wsa error code is stored in the SOAP
@@ -455,7 +455,7 @@ accepts fault messages that are relayed by other services.
 Basically, we use a trick to generate the SOAP-ENV:Fault struct via a one-way
 service operation. This allows us both to implement a one-way service operation
 that accepts faults and to automatically generate the fault struct for fault
-data storage and manipulation. 
+data storage and manipulation.
 
 The fault operation in the WS-Addressing files (wsa5.h etc.) is declared as
 follows (here shown for the 2004/08 standard):
@@ -472,7 +472,7 @@ int SOAP_ENV__Fault
         char			*SOAP_ENV__Node,	// SOAP 1.2
         char			*SOAP_ENV__Role,	// SOAP 1.2
         struct SOAP_ENV__Detail	*SOAP_ENV__Detail,	// SOAP 1.2
-	void
+    void
 );
 @endcode
 
@@ -487,7 +487,7 @@ something like:
 
 @code
 int SOAP_ENV__Fault(struct soap *soap, char *faultcode, char *faultstring, char *faultactor, struct SOAP_ENV__Detail *detail, struct SOAP_ENV__Code *SOAP_ENV__Code, struct SOAP_ENV__Reason *SOAP_ENV__Reason, char *SOAP_ENV__Node, char *SOAP_ENV__Role, struct SOAP_ENV__Detail *SOAP_ENV__Detail)
-{ 
+{
   ... = faultcode; // SOAP 1.1 fault code string (QName)
   ... = faultstring; // SOAP 1.1 fault string
   ... = faultactor; // SOAP 1.1 fault actor string
@@ -645,7 +645,7 @@ soap_wsa_request(struct soap *soap, const char *id, const char *to, const char *
 @fn int soap_wsa_add_From(struct soap *soap, const char *from)
 @brief Sets WS-Addressing From header for request message.
 @param soap context
-@param[in] from endpoint URI 
+@param[in] from endpoint URI
 @return SOAP_OK or SOAP_ERR
 
 Use soap_wsa_request to populate the WS-Addressing header first.
@@ -672,7 +672,7 @@ Use soap_wsa_request to populate the WS-Addressing header.
 */
 int
 soap_wsa_add_NoReply(struct soap *soap)
-{ return soap_wsa_add_ReplyTo(soap, soap_wsa_noneURI); 
+{ return soap_wsa_add_ReplyTo(soap, soap_wsa_noneURI);
 }
 
 /**
@@ -729,7 +729,7 @@ soap_wsa_add_FaultTo(struct soap *soap, const char *faultTo)
 @fn int soap_wsa_add_RelatesTo(struct soap *soap, const char *relatesTo)
 @brief Sets WS-Addressing RelatesTo header.
 @param soap context
-@param[in] relatesTo endpoint URI 
+@param[in] relatesTo endpoint URI
 @return SOAP_OK or SOAP_ERR
 
 Use soap_wsa_request to populate the WS-Addressing header.
@@ -866,7 +866,7 @@ soap_wsa_reply(struct soap *soap, const char *id, const char *action)
     SOAP_WSA_(soap_default_,RelatesTo)(soap, newheader->SOAP_WSA(RelatesTo));
     newheader->SOAP_WSA(RelatesTo)->__item = oldheader->SOAP_WSA(MessageID);
   }
-#ifdef SOAP_WSA_2005 
+#ifdef SOAP_WSA_2005
   /* WCF Interoperability:
      ChannelInstance is required when the WCF Application hosts multiple
      Callback Channels within the same application. The
@@ -881,7 +881,7 @@ soap_wsa_reply(struct soap *soap, const char *id, const char *action)
     { if (!newheader->chan__ChannelInstance)
       { newheader->chan__ChannelInstance = (struct chan__ChannelInstanceType*)soap_malloc(soap, sizeof(struct chan__ChannelInstanceType));
         if (newheader->chan__ChannelInstance)
-	{ soap_default_chan__ChannelInstanceType(soap, newheader->chan__ChannelInstance);
+    { soap_default_chan__ChannelInstanceType(soap, newheader->chan__ChannelInstance);
           newheader->chan__ChannelInstance->__item = *(oldheader->SOAP_WSA(ReplyTo)->ReferenceParameters->chan__ChannelInstance);
           newheader->chan__ChannelInstance->wsa5__IsReferenceParameter = _wsa5__IsReferenceParameter__true;
         }
@@ -900,14 +900,14 @@ soap_wsa_reply(struct soap *soap, const char *id, const char *action)
     { struct soap *reply_soap = soap_copy(soap);
       if (reply_soap)
       { soap_copy_stream(reply_soap, soap);
-	soap_free_stream(soap); /* prevents close in soap_connect() below */
+    soap_free_stream(soap); /* prevents close in soap_connect() below */
         if (soap_connect(soap, newheader->SOAP_WSA(To), newheader->SOAP_WSA(Action)))
         { int err;
-	  soap_copy_stream(soap, reply_soap);
-	  soap_free_stream(reply_soap);
+      soap_copy_stream(soap, reply_soap);
+      soap_free_stream(reply_soap);
           soap_end(reply_soap);
           soap_free(reply_soap);
-	  soap->header = oldheader;
+      soap->header = oldheader;
 #if defined(SOAP_WSA_2005)
           err = soap_wsa_error(soap, SOAP_WSA(DestinationUnreachable), newheader->SOAP_WSA(To));
 #elif defined(SOAP_WSA_2003)
@@ -955,7 +955,7 @@ soap_wsa_reply(struct soap *soap, const char *id, const char *action)
 */
 int
 soap_wsa_fault_subcode(struct soap *soap, int flag, const char *faultsubcode, const char *faultstring, const char *faultdetail)
-{ return soap_wsa_fault_subcode_action(soap, flag, faultsubcode, faultstring, faultdetail, NULL); 
+{ return soap_wsa_fault_subcode_action(soap, flag, faultsubcode, faultstring, faultdetail, NULL);
 }
 
 /**
@@ -1147,18 +1147,18 @@ soap_wsa_check_fault(struct soap *soap, SOAP_WSA(FaultCodesType) *fault, const c
         { switch (detail->__type)
           { case SOAP_WSA_(SOAP_TYPE_,ProblemHeaderQName):
             case SOAP_WSA_(SOAP_TYPE_,ProblemIRI):
-	      *info = (char*)detail->fault;
-	      break;
+          *info = (char*)detail->fault;
+          break;
             case SOAP_WSA_(SOAP_TYPE_,ProblemAction):
-	      *info = ((SOAP_WSA_(,ProblemAction)*)detail->fault)->Action;
-	      break;
-	    default:
-	      break;
+          *info = ((SOAP_WSA_(,ProblemAction)*)detail->fault)->Action;
+          break;
+        default:
+          break;
           }
         }
       }
       return soap->error;
-    } 
+    }
   }
   return SOAP_OK;
 }
@@ -1195,7 +1195,7 @@ soap_wsa_check_fault(struct soap *soap, SOAP_WSA(FaultSubcodeValues) *fault)
     if (code)
     { SOAP_WSA__(soap_s2,FaultSubcodeValues)(soap, code, fault);
       return soap->error;
-    } 
+    }
   }
   return SOAP_OK;
 }

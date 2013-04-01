@@ -72,14 +72,14 @@ typedef enum wsdd__FaultCodeType wsdd__FaultCodeType;
 /* wsa:EndpointReferenceType */
 struct wsa__EndpointReferenceType
 {
-	char *Address;	/* required element of type xsd:string */
-	struct wsa__ReferencePropertiesType *ReferenceProperties;	/* optional element of type wsa:ReferencePropertiesType */
-	struct wsa__ReferenceParametersType *ReferenceParameters;	/* optional element of type wsa:ReferenceParametersType */
-	char **PortType;	/* optional element of type xsd:QName */
-	struct wsa__ServiceNameType *ServiceName;	/* optional element of type wsa:ServiceNameType */
-	int __size;	/* sequence of elements <-any> */
-	char **__any;
-	char *__anyAttribute;	/* optional attribute of type xsd:anyType */
+    char *Address;	/* required element of type xsd:string */
+    struct wsa__ReferencePropertiesType *ReferenceProperties;	/* optional element of type wsa:ReferencePropertiesType */
+    struct wsa__ReferenceParametersType *ReferenceParameters;	/* optional element of type wsa:ReferenceParametersType */
+    char **PortType;	/* optional element of type xsd:QName */
+    struct wsa__ServiceNameType *ServiceName;	/* optional element of type wsa:ServiceNameType */
+    int __size;	/* sequence of elements <-any> */
+    char **__any;
+    char *__anyAttribute;	/* optional attribute of type xsd:anyType */
 };
 typedef struct wsa__EndpointReferenceType wsa__EndpointReferenceType;
 #endif
@@ -89,8 +89,8 @@ typedef struct wsa__EndpointReferenceType wsa__EndpointReferenceType;
 /* wsa:ReferencePropertiesType */
 struct wsa__ReferencePropertiesType
 {
-	int __size;	/* sequence of elements <-any> */
-	char **__any;
+    int __size;	/* sequence of elements <-any> */
+    char **__any;
 };
 typedef struct wsa__ReferencePropertiesType wsa__ReferencePropertiesType;
 #endif
@@ -100,8 +100,8 @@ typedef struct wsa__ReferencePropertiesType wsa__ReferencePropertiesType;
 /* wsa:ReferenceParametersType */
 struct wsa__ReferenceParametersType
 {
-	int __size;	/* sequence of elements <-any> */
-	char **__any;
+    int __size;	/* sequence of elements <-any> */
+    char **__any;
 };
 typedef struct wsa__ReferenceParametersType wsa__ReferenceParametersType;
 #endif
@@ -111,9 +111,9 @@ typedef struct wsa__ReferenceParametersType wsa__ReferenceParametersType;
 /* Primitive wsa:ServiceNameType schema type: */
 struct wsa__ServiceNameType
 {
-	char *__item;
-	char *PortName;	/* optional attribute of type xsd:string */
-	char *__anyAttribute;	/* optional attribute of type xsd:anyType */
+    char *__item;
+    char *PortName;	/* optional attribute of type xsd:string */
+    char *__anyAttribute;	/* optional attribute of type xsd:anyType */
 };
 typedef struct wsa__ServiceNameType wsa__ServiceNameType;
 #endif
@@ -123,9 +123,9 @@ typedef struct wsa__ServiceNameType wsa__ServiceNameType;
 /* Primitive wsa:Relationship schema type: */
 struct wsa__Relationship
 {
-	char *__item;
-	char *RelationshipType;	/* optional attribute of type xsd:QName */
-	char *__anyAttribute;	/* optional attribute of type xsd:anyType */
+    char *__item;
+    char *RelationshipType;	/* optional attribute of type xsd:QName */
+    char *__anyAttribute;	/* optional attribute of type xsd:anyType */
 };
 typedef struct wsa__Relationship wsa__Relationship;
 #endif
@@ -137,14 +137,14 @@ typedef struct wsa__Relationship wsa__Relationship;
 /* SOAP Header: */
 struct SOAP_ENV__Header
 {
-	char *wsa__MessageID;	/* optional element of type wsa:MessageID */
-	struct wsa__Relationship *wsa__RelatesTo;	/* optional element of type wsa:RelatesTo */
-	struct wsa__EndpointReferenceType *wsa__From;	/* optional element of type wsa:From */
-	struct wsa__EndpointReferenceType *wsa__ReplyTo;	/* mustUnderstand */
-	struct wsa__EndpointReferenceType *wsa__FaultTo;	/* mustUnderstand */
-	char *wsa__To;	/* mustUnderstand */
-	char *wsa__Action;	/* mustUnderstand */
-	struct wsdd__AppSequenceType *wsdd__AppSequence;	/* optional element of type wsdd:AppSequenceType */
+    char *wsa__MessageID;	/* optional element of type wsa:MessageID */
+    struct wsa__Relationship *wsa__RelatesTo;	/* optional element of type wsa:RelatesTo */
+    struct wsa__EndpointReferenceType *wsa__From;	/* optional element of type wsa:From */
+    struct wsa__EndpointReferenceType *wsa__ReplyTo;	/* mustUnderstand */
+    struct wsa__EndpointReferenceType *wsa__FaultTo;	/* mustUnderstand */
+    char *wsa__To;	/* mustUnderstand */
+    char *wsa__Action;	/* mustUnderstand */
+    struct wsdd__AppSequenceType *wsdd__AppSequence;	/* optional element of type wsdd:AppSequenceType */
 };
 #endif
 
@@ -155,11 +155,11 @@ struct SOAP_ENV__Header
 /* wsdd:HelloType */
 struct wsdd__HelloType
 {
-	struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
-	char *Types;	/* optional element of type xsd:QName */
-	struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
-	char *XAddrs;	/* optional element of type wsdd:UriListType */
-	unsigned int MetadataVersion;	/* required element of type xsd:unsignedInt */
+    struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
+    char *Types;	/* optional element of type xsd:QName */
+    struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
+    char *XAddrs;	/* optional element of type wsdd:UriListType */
+    unsigned int MetadataVersion;	/* required element of type xsd:unsignedInt */
 };
 typedef struct wsdd__HelloType wsdd__HelloType;
 #endif
@@ -169,11 +169,11 @@ typedef struct wsdd__HelloType wsdd__HelloType;
 /* wsdd:ByeType */
 struct wsdd__ByeType
 {
-	struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
-	char *Types;	/* optional element of type xsd:QName */
-	struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
-	char *XAddrs;	/* optional element of type wsdd:UriListType */
-	unsigned int *MetadataVersion;	/* optional element of type xsd:unsignedInt */
+    struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
+    char *Types;	/* optional element of type xsd:QName */
+    struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
+    char *XAddrs;	/* optional element of type wsdd:UriListType */
+    unsigned int *MetadataVersion;	/* optional element of type xsd:unsignedInt */
 };
 typedef struct wsdd__ByeType wsdd__ByeType;
 #endif
@@ -183,8 +183,8 @@ typedef struct wsdd__ByeType wsdd__ByeType;
 /* wsdd:ProbeType */
 struct wsdd__ProbeType
 {
-	char *Types;	/* optional element of type xsd:QName */
-	struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
+    char *Types;	/* optional element of type xsd:QName */
+    struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
 };
 typedef struct wsdd__ProbeType wsdd__ProbeType;
 #endif
@@ -194,8 +194,8 @@ typedef struct wsdd__ProbeType wsdd__ProbeType;
 /* wsdd:ProbeMatchesType */
 struct wsdd__ProbeMatchesType
 {
-	int __sizeProbeMatch;	/* sequence of elements <ProbeMatch> */
-	struct wsdd__ProbeMatchType *ProbeMatch;	/* optional element of type wsdd:ProbeMatchType */
+    int __sizeProbeMatch;	/* sequence of elements <ProbeMatch> */
+    struct wsdd__ProbeMatchType *ProbeMatch;	/* optional element of type wsdd:ProbeMatchType */
 };
 typedef struct wsdd__ProbeMatchesType wsdd__ProbeMatchesType;
 #endif
@@ -205,11 +205,11 @@ typedef struct wsdd__ProbeMatchesType wsdd__ProbeMatchesType;
 /* wsdd:ProbeMatchType */
 struct wsdd__ProbeMatchType
 {
-	struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
-	char *Types;	/* optional element of type xsd:QName */
-	struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
-	char *XAddrs;	/* optional element of type wsdd:UriListType */
-	unsigned int MetadataVersion;	/* required element of type xsd:unsignedInt */
+    struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
+    char *Types;	/* optional element of type xsd:QName */
+    struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
+    char *XAddrs;	/* optional element of type wsdd:UriListType */
+    unsigned int MetadataVersion;	/* required element of type xsd:unsignedInt */
 };
 typedef struct wsdd__ProbeMatchType wsdd__ProbeMatchType;
 #endif
@@ -219,7 +219,7 @@ typedef struct wsdd__ProbeMatchType wsdd__ProbeMatchType;
 /* wsdd:ResolveType */
 struct wsdd__ResolveType
 {
-	struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
+    struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
 };
 typedef struct wsdd__ResolveType wsdd__ResolveType;
 #endif
@@ -229,7 +229,7 @@ typedef struct wsdd__ResolveType wsdd__ResolveType;
 /* wsdd:ResolveMatchesType */
 struct wsdd__ResolveMatchesType
 {
-	struct wsdd__ResolveMatchType *ResolveMatch;	/* optional element of type wsdd:ResolveMatchType */
+    struct wsdd__ResolveMatchType *ResolveMatch;	/* optional element of type wsdd:ResolveMatchType */
 };
 typedef struct wsdd__ResolveMatchesType wsdd__ResolveMatchesType;
 #endif
@@ -239,11 +239,11 @@ typedef struct wsdd__ResolveMatchesType wsdd__ResolveMatchesType;
 /* wsdd:ResolveMatchType */
 struct wsdd__ResolveMatchType
 {
-	struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
-	char *Types;	/* optional element of type xsd:QName */
-	struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
-	char *XAddrs;	/* optional element of type wsdd:UriListType */
-	unsigned int MetadataVersion;	/* required element of type xsd:unsignedInt */
+    struct wsa__EndpointReferenceType wsa__EndpointReference;	/* required element of type wsa:EndpointReference */
+    char *Types;	/* optional element of type xsd:QName */
+    struct wsdd__ScopesType *Scopes;	/* optional element of type wsdd:ScopesType */
+    char *XAddrs;	/* optional element of type wsdd:UriListType */
+    unsigned int MetadataVersion;	/* required element of type xsd:unsignedInt */
 };
 typedef struct wsdd__ResolveMatchType wsdd__ResolveMatchType;
 #endif
@@ -253,7 +253,7 @@ typedef struct wsdd__ResolveMatchType wsdd__ResolveMatchType;
 /* wsdd:SecurityType */
 struct wsdd__SecurityType
 {
-	struct wsdd__SigType *Sig;	/* optional element of type wsdd:SigType */
+    struct wsdd__SigType *Sig;	/* optional element of type wsdd:SigType */
 };
 typedef struct wsdd__SecurityType wsdd__SecurityType;
 #endif
@@ -263,10 +263,10 @@ typedef struct wsdd__SecurityType wsdd__SecurityType;
 /* wsdd:SigType */
 struct wsdd__SigType
 {
-	char *Scheme;	/* required attribute of type xsd:string */
-	char *KeyId;	/* optional attribute of type xsd:string */
-	char *Refs;	/* required attribute of type xsd:string */
-	char *Sig;	/* required attribute of type xsd:string */
+    char *Scheme;	/* required attribute of type xsd:string */
+    char *KeyId;	/* optional attribute of type xsd:string */
+    char *Refs;	/* required attribute of type xsd:string */
+    char *Sig;	/* required attribute of type xsd:string */
 };
 typedef struct wsdd__SigType wsdd__SigType;
 #endif
@@ -276,8 +276,8 @@ typedef struct wsdd__SigType wsdd__SigType;
 /* Primitive wsdd:ScopesType schema type: */
 struct wsdd__ScopesType
 {
-	char *__item;
-	char *MatchBy;	/* optional attribute of type xsd:string */
+    char *__item;
+    char *MatchBy;	/* optional attribute of type xsd:string */
 };
 typedef struct wsdd__ScopesType wsdd__ScopesType;
 #endif
@@ -287,9 +287,9 @@ typedef struct wsdd__ScopesType wsdd__ScopesType;
 /* wsdd:AppSequenceType */
 struct wsdd__AppSequenceType
 {
-	unsigned int InstanceId;	/* required attribute of type xsd:unsignedInt */
-	char *SequenceId;	/* optional attribute of type xsd:string */
-	unsigned int MessageNumber;	/* required attribute of type xsd:unsignedInt */
+    unsigned int InstanceId;	/* required attribute of type xsd:unsignedInt */
+    char *SequenceId;	/* optional attribute of type xsd:string */
+    unsigned int MessageNumber;	/* required attribute of type xsd:unsignedInt */
 };
 typedef struct wsdd__AppSequenceType wsdd__AppSequenceType;
 #endif
@@ -299,7 +299,7 @@ typedef struct wsdd__AppSequenceType wsdd__AppSequenceType;
 /* Operation wrapper: */
 struct __wsdd__Hello
 {
-	struct wsdd__HelloType *wsdd__Hello;	/* optional element of type wsdd:HelloType */
+    struct wsdd__HelloType *wsdd__Hello;	/* optional element of type wsdd:HelloType */
 };
 #endif
 
@@ -308,7 +308,7 @@ struct __wsdd__Hello
 /* Operation wrapper: */
 struct __wsdd__Bye
 {
-	struct wsdd__ByeType *wsdd__Bye;	/* optional element of type wsdd:ByeType */
+    struct wsdd__ByeType *wsdd__Bye;	/* optional element of type wsdd:ByeType */
 };
 #endif
 
@@ -317,7 +317,7 @@ struct __wsdd__Bye
 /* Operation wrapper: */
 struct __wsdd__Probe
 {
-	struct wsdd__ProbeType *wsdd__Probe;	/* optional element of type wsdd:ProbeType */
+    struct wsdd__ProbeType *wsdd__Probe;	/* optional element of type wsdd:ProbeType */
 };
 #endif
 
@@ -326,7 +326,7 @@ struct __wsdd__Probe
 /* Operation wrapper: */
 struct __wsdd__ProbeMatches
 {
-	struct wsdd__ProbeMatchesType *wsdd__ProbeMatches;	/* optional element of type wsdd:ProbeMatchesType */
+    struct wsdd__ProbeMatchesType *wsdd__ProbeMatches;	/* optional element of type wsdd:ProbeMatchesType */
 };
 #endif
 
@@ -335,7 +335,7 @@ struct __wsdd__ProbeMatches
 /* Operation wrapper: */
 struct __wsdd__Resolve
 {
-	struct wsdd__ResolveType *wsdd__Resolve;	/* optional element of type wsdd:ResolveType */
+    struct wsdd__ResolveType *wsdd__Resolve;	/* optional element of type wsdd:ResolveType */
 };
 #endif
 
@@ -344,7 +344,7 @@ struct __wsdd__Resolve
 /* Operation wrapper: */
 struct __wsdd__ResolveMatches
 {
-	struct wsdd__ResolveMatchesType *wsdd__ResolveMatches;	/* optional element of type wsdd:ResolveMatchesType */
+    struct wsdd__ResolveMatchesType *wsdd__ResolveMatches;	/* optional element of type wsdd:ResolveMatchesType */
 };
 #endif
 
@@ -355,8 +355,8 @@ struct __wsdd__ResolveMatches
 /* SOAP Fault Code: */
 struct SOAP_ENV__Code
 {
-	char *SOAP_ENV__Value;	/* optional element of type xsd:QName */
-	struct SOAP_ENV__Code *SOAP_ENV__Subcode;	/* optional element of type SOAP-ENV:Code */
+    char *SOAP_ENV__Value;	/* optional element of type xsd:QName */
+    struct SOAP_ENV__Code *SOAP_ENV__Subcode;	/* optional element of type SOAP-ENV:Code */
 };
 #endif
 
@@ -369,9 +369,9 @@ struct SOAP_ENV__Code
 /* SOAP-ENV:Detail */
 struct SOAP_ENV__Detail
 {
-	char *__any;
-	int __type;	/* any type of element <fault> (defined below) */
-	void *fault;	/* transient */
+    char *__any;
+    int __type;	/* any type of element <fault> (defined below) */
+    void *fault;	/* transient */
 };
 #endif
 
@@ -384,7 +384,7 @@ struct SOAP_ENV__Detail
 /* SOAP-ENV:Reason */
 struct SOAP_ENV__Reason
 {
-	char *SOAP_ENV__Text;	/* optional element of type xsd:string */
+    char *SOAP_ENV__Text;	/* optional element of type xsd:string */
 };
 #endif
 
@@ -397,15 +397,15 @@ struct SOAP_ENV__Reason
 /* SOAP Fault: */
 struct SOAP_ENV__Fault
 {
-	char *faultcode;	/* optional element of type xsd:QName */
-	char *faultstring;	/* optional element of type xsd:string */
-	char *faultactor;	/* optional element of type xsd:string */
-	struct SOAP_ENV__Detail *detail;	/* optional element of type SOAP-ENV:Detail */
-	struct SOAP_ENV__Code *SOAP_ENV__Code;	/* optional element of type SOAP-ENV:Code */
-	struct SOAP_ENV__Reason *SOAP_ENV__Reason;	/* optional element of type SOAP-ENV:Reason */
-	char *SOAP_ENV__Node;	/* optional element of type xsd:string */
-	char *SOAP_ENV__Role;	/* optional element of type xsd:string */
-	struct SOAP_ENV__Detail *SOAP_ENV__Detail;	/* optional element of type SOAP-ENV:Detail */
+    char *faultcode;	/* optional element of type xsd:QName */
+    char *faultstring;	/* optional element of type xsd:string */
+    char *faultactor;	/* optional element of type xsd:string */
+    struct SOAP_ENV__Detail *detail;	/* optional element of type SOAP-ENV:Detail */
+    struct SOAP_ENV__Code *SOAP_ENV__Code;	/* optional element of type SOAP-ENV:Code */
+    struct SOAP_ENV__Reason *SOAP_ENV__Reason;	/* optional element of type SOAP-ENV:Reason */
+    char *SOAP_ENV__Node;	/* optional element of type xsd:string */
+    char *SOAP_ENV__Role;	/* optional element of type xsd:string */
+    struct SOAP_ENV__Detail *SOAP_ENV__Detail;	/* optional element of type SOAP-ENV:Detail */
 };
 #endif
 

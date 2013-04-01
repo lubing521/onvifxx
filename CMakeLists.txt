@@ -13,48 +13,30 @@ if(ONLY_SERVER AND ONLY_CLIENT)
 	message(FATAL_ERROR "Set just one option ONLY_SERVER or ONLY_CLIENT!")
 endif(ONLY_SERVER AND ONLY_CLIENT)
 
-set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
-set(GSOAP_DIR ${PROJECT_BINARY_DIR}/gsoap)
-file(MAKE_DIRECTORY ${GSOAP_DIR})
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++0x")
 
-aux_source_directory(${GSOAP_DIR}/src GSOAP_SOURCES)
-if(NOT "${GSOAP_SOURCES}")
-	if(ONLY_SERVER)
-		set(GENERATOR_OPTION "S")
-		file(GLOB CLIENT_SOURCES src/*_c.cpp)
-		LIST(REMOVE_ITEM SOURCES ${CLIENT_SOURCES})
-	elseif(ONLY_CLIENT)
-		set(GENERATOR_OPTION "C")
-		file(GLOB SERVER_SOURCES src/*_c.cpp)
-		LIST(REMOVE_ITEM SOURCES ${SERVER_SOURCES})
-	# else no option and do not filter SOURCES
-	endif(ONLY_SERVER)
-
-	message(STATUS "Running generator with option ${GENERATOR_OPTION}")
-	execute_process(
-		COMMAND ${PROJECT_SOURCE_DIR}/generator.sh ${GENERATOR_OPTION}
-		WORKING_DIRECTORY ${GSOAP_DIR}
-	)
-
-	aux_source_directory(${GSOAP_DIR}/src GSOAP_SOURCES)
-endif(NOT "${GSOAP_SOURCES}")
-
+add_subdirectory(gsoap)
 add_subdirectory(wsdd)
+
+if(ONLY_SERVER)
+	file(GLOB SOURCES src/*_s.cpp)
+elseif(ONLY_CLIENT)
+	file(GLOB SOURCES src/*_c.cpp)
+else(ONLY_SERVER)
+	aux_source_directory(${PROJECT_SOURCE_DIR}/src SOURCES)
+endif(ONLY_SERVER)
 
 file(GLOB XML_FILES xml/*.*)
 file(GLOB_RECURSE HEADERS  ${PROJECT_SOURCE_DIR}/include/*.hpp)
-file(GLOB GSOAP_HEADERS ${GSOAP_DIR}/src/*.h)
-aux_source_directory(${PROJECT_SOURCE_DIR}/src SOURCES)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${GSOAP_DIR}/src)
+include_directories(${CMAKE_BINARY_DIR}/gsoap/src)
 
-add_definitions(-DWITH_PURE_VIRTUAL)
 add_library(${PROJECT_NAME} SHARED
-	${SOURCES} ${HEADERS} ${GSOAP_SOURCES} ${GSOAP_HEADERS} ${XML_FILES}
+	${SOURCES} ${HEADERS} ${XML_FILES}
 	generator.sh typemap.dat
 )
-target_link_libraries(${PROJECT_NAME} gsoap++)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_gsoap ${PROJECT_NAME}_wsdd gsoap)
 
 if(WITH_TESTS)
 	 add_subdirectory(tests)

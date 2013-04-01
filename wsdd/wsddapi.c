@@ -377,7 +377,7 @@ int SOAP_ENV__Fault(struct soap *soap, char *faultcode, char *faultstring, char 
 
 #include "wsddapi.h"
 
-#ifdef SOAP_WSA_2005
+#ifndef SOAP_WSA_2005
 /* WS-Discovery 1.0 */
 const char *to_ts_URL = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
 #else

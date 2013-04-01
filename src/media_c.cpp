@@ -1,15 +1,15 @@
 #include <onvifxx/media.hpp>
-#include <onvifMediaBindingProxy.h>
+//#include <onvifClient.h>
 
 namespace onvifxx {
 
-struct MediaClient : MediaBindingProxy, Media
+struct MediaClient : Media
 {
     virtual	Capabilities getServiceCapabilities()
     {
-        int result = MediaBindingProxy::GetServiceCapabilities(0, 0);
-        if (result != SOAP_OK)
-            throw std::exception();
+//        int result = MediaBindingProxy::GetServiceCapabilities(0, 0);
+//        if (result != SOAP_OK)
+//            throw std::exception();
 
         return Capabilities();
     }

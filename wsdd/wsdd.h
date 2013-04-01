@@ -13,4 +13,14 @@ typedef struct
     void (*resolveMatches)(struct soap *, unsigned int, const char *, unsigned int, const char *, const char *, struct wsdd__ResolveMatchType *);
 } EventHandlerMap;
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+struct Namespace * wsdd_namespaces();
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
+
 #endif // WSDD_H
