@@ -36,6 +36,18 @@ add_library(${PROJECT_NAME} SHARED
 	${SOURCES} ${HEADERS} ${XML_FILES}
 	generator.sh typemap.dat
 )
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+find_package(gsoap)
+if(gsoap_found)
+	set(gsoap_path ${gsoap_path_found} cache path "path where gsoap is installed" force)
+else(gsoap_found)
+	message(fatal_error
+	"could not find gsoap! please specify path to gsoap either with the "
+	"gsoap_path cmake variable or gsoap_path environment variable. see "
+	"for more information.")
+endif(gsoap_found)
+
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_gsoap ${PROJECT_NAME}_wsdd gsoap)
 
 if(WITH_TESTS)
