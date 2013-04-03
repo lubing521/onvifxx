@@ -1,5 +1,5 @@
 git clone git://github.com/sigrand/onvifxx.git
-mkdir onvifcxx-build
-cd onvifcxx-build
-cmake ../onvifcxx
+mkdir onvifxx-build
+cd onvifxx-build
+cmake ../onvifxx
 make && make install
