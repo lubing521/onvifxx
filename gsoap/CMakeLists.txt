@@ -1,7 +1,7 @@
 project(${CMAKE_PROJECT_NAME}_gsoap)
 cmake_minimum_required(VERSION 2.6)
 
-set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-fPIC")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
 find_package(GSOAP REQUIRED)
 

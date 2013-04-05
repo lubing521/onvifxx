@@ -1,8 +1,7 @@
 #include <onvifxx/discovery.hpp>
 #include "../wsdd/wsdd.h"
+#include "../sock/gsoapsock.hpp"
 
-#include <boost/asio.hpp>
-#include <boost/asio/streambuf.hpp>
 #include <boost/array.hpp>
 
 namespace onvifxx {
@@ -22,6 +21,8 @@ public:
         soap_init(&soap_);
         soap_set_namespaces(&soap_, wsdd_namespaces());
         soap_.user = this;
+
+        GsoapSock::assign(&soap_);
     }
 
     template<class T>
@@ -83,21 +84,20 @@ public:
             throw SoapException(&soap_);
 
 
-        while (true) {
-            boost::array<char, 1024> buf;
-            const auto count = recvfrom(soap_.socket, buf.data(), buf.size(), 0, nullptr, nullptr);
-            if (count < 0)
-                throw UnixException();
+//        while (true) {
+//            boost::array<char, 1024> buf;
+//            const auto count = recvfrom(soap_.socket, buf.data(), buf.size(), 0, nullptr, nullptr);
+//            if (count < 0)
+//                throw UnixException();
 
-            buf[count] = '\0';
-            std::cerr.write(buf.data(), count);
-        }
+//            buf[count] = '\0';
+//            std::cerr.write(buf.data(), count);
+//        }
     }
 
 private:
     soap soap_;
     EventHandlerMap ehm_;
-    boost::asio::io_service ios;
 };
 
 DiscoveryClient::DiscoveryClient()

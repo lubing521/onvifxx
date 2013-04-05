@@ -1,6 +1,8 @@
 project(onvifxx)
 cmake_minimum_required(VERSION 2.6)
 
+#-DCMAKE_BUILD_TYPE=Debug
+
 if(NOT CMAKE_COMPILER_IS_GNUCXX)
 	message(FATAL_ERROR "Use gcc compiler!")
 endif(NOT CMAKE_COMPILER_IS_GNUCXX)
