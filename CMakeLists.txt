@@ -16,6 +16,7 @@ endif(ONLY_SERVER AND ONLY_CLIENT)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++0x")
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
+add_subdirectory(sock)
 add_subdirectory(gsoap)
 add_subdirectory(wsdd)
 
@@ -40,13 +41,14 @@ endif(Boost_FOUND)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR}/gsoap/src)
+add_definitions(-DWITH_NOIO -DWITH_SOAPDEFS_H)
 
 add_library(${PROJECT_NAME} SHARED
 	${SOURCES} ${HEADERS} ${XML_FILES}
 	generator.sh typemap.dat
 )
 target_link_libraries(${PROJECT_NAME}
-	${PROJECT_NAME}_gsoap ${PROJECT_NAME}_wsdd
+	${PROJECT_NAME}_sock ${PROJECT_NAME}_gsoap ${PROJECT_NAME}_wsdd
 	${Boost_LIBRARIES})
 
 if(WITH_TESTS)

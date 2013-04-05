@@ -170,7 +170,7 @@ SOAP_FMAC3 const char * SOAP_FMAC4 soap_check_faultdetail(struct soap *soap)
 
 #endif
 
-//#ifndef WITH_NOIDREF
+#ifndef WITH_NOIDREF
 SOAP_FMAC3 int SOAP_FMAC4 soap_getindependent(struct soap *soap)
 {
     int t;
@@ -185,7 +185,7 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_getindependent(struct soap *soap)
         soap->error = SOAP_OK;
     return soap->error;
 }
-//#endif
+#endif
 
 #ifndef WITH_NOIDREF
 SOAP_FMAC3 void * SOAP_FMAC4 soap_getelement(struct soap *soap, int *type)
@@ -481,7 +481,6 @@ SOAP_FMAC3 void * SOAP_FMAC4 soap_getelement(struct soap *soap, int *type)
     soap->error = SOAP_TAG_MISMATCH;
     return NULL;
 }
-#endif
 
 SOAP_FMAC3 int SOAP_FMAC4 soap_ignore_element(struct soap *soap)
 {
@@ -513,7 +512,6 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_ignore_element(struct soap *soap)
     return soap->error;
 }
 
-//#ifndef WITH_NOIDREF
 SOAP_FMAC3 int SOAP_FMAC4 soap_putindependent(struct soap *soap)
 {
     int i;
@@ -526,9 +524,7 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_putindependent(struct soap *soap)
                         return soap->error;
     return SOAP_OK;
 }
-//#endif
 
-#ifndef WITH_NOIDREF
 SOAP_FMAC3 int SOAP_FMAC4 soap_putelement(struct soap *soap, const void *ptr, const char *tag, int id, int type)
 {	(void)tag;
     switch (type)
@@ -650,9 +646,7 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_putelement(struct soap *soap, const void *ptr, co
     }
     return SOAP_OK;
 }
-#endif
 
-#ifndef WITH_NOIDREF
 SOAP_FMAC3 void SOAP_FMAC4 soap_markelement(struct soap *soap, const void *ptr, int type)
 {
     (void)soap; (void)ptr; (void)type; /* appease -Wall -Werror */
@@ -828,7 +822,6 @@ SOAP_FMAC3 void SOAP_FMAC4 soap_markelement(struct soap *soap, const void *ptr, 
         break;
     }
 }
-#endif
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_byte(struct soap *soap, char *a)
 {
@@ -940,6 +933,7 @@ SOAP_FMAC3 unsigned int * SOAP_FMAC4 soap_get_unsignedInt(struct soap *soap, uns
             return NULL;
     return p;
 }
+#endif
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_wsdd__FaultCodeType(struct soap *soap, enum wsdd__FaultCodeType *a)
 {
@@ -1023,6 +1017,8 @@ SOAP_FMAC3 enum wsdd__FaultCodeType * SOAP_FMAC4 soap_get_wsdd__FaultCodeType(st
     return p;
 }
 
+#ifndef WITH_NOGLOBAL
+
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_wsa__FaultSubcodeValues(struct soap *soap, enum wsa__FaultSubcodeValues *a)
 {
     (void)soap; /* appease -Wall -Werror */
@@ -1041,6 +1037,7 @@ static const struct soap_code_map soap_codes_wsa__FaultSubcodeValues[] =
     { (long)wsa__EndpointUnavailable, "wsa:EndpointUnavailable" },
     { 0, NULL }
 };
+
 
 SOAP_FMAC3S const char* SOAP_FMAC4S soap_wsa__FaultSubcodeValues2s(struct soap *soap, enum wsa__FaultSubcodeValues n)
 {	const char *s = soap_code_str(soap_codes_wsa__FaultSubcodeValues, (long)n);
@@ -1190,8 +1187,6 @@ SOAP_FMAC3 enum wsa__RelationshipTypeValues * SOAP_FMAC4 soap_get_wsa__Relations
             return NULL;
     return p;
 }
-
-#ifndef WITH_NOGLOBAL
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_SOAP_ENV__Fault(struct soap *soap, struct SOAP_ENV__Fault *a)
 {
@@ -1347,10 +1342,6 @@ SOAP_FMAC3 struct SOAP_ENV__Fault * SOAP_FMAC4 soap_get_SOAP_ENV__Fault(struct s
             return NULL;
     return p;
 }
-
-#endif
-
-#ifndef WITH_NOGLOBAL
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_SOAP_ENV__Reason(struct soap *soap, struct SOAP_ENV__Reason *a)
 {
@@ -3099,7 +3090,7 @@ SOAP_FMAC3 struct wsdd__HelloType * SOAP_FMAC4 soap_get_wsdd__HelloType(struct s
     return p;
 }
 
-//#ifndef WITH_NOGLOBAL
+#ifndef WITH_NOGLOBAL
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_SOAP_ENV__Header(struct soap *soap, struct SOAP_ENV__Header *a)
 {
@@ -3249,8 +3240,6 @@ SOAP_FMAC3 struct SOAP_ENV__Header * SOAP_FMAC4 soap_get_SOAP_ENV__Header(struct
             return NULL;
     return p;
 }
-
-//#endif
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_wsa__Relationship(struct soap *soap, struct wsa__Relationship *a)
 {
@@ -3723,7 +3712,6 @@ SOAP_FMAC3 struct wsa__EndpointReferenceType * SOAP_FMAC4 soap_get_wsa__Endpoint
     return p;
 }
 
-#ifndef WITH_NOGLOBAL
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_serialize_PointerToSOAP_ENV__Reason(struct soap *soap, struct SOAP_ENV__Reason *const*a)
 {
@@ -4580,6 +4568,8 @@ SOAP_FMAC3 char ** SOAP_FMAC4 soap_get_wsdd__QNameListType(struct soap *soap, ch
     return p;
 }
 
+#ifndef WITH_NOGLOBAL
+
 SOAP_FMAC3 void SOAP_FMAC4 soap_serialize_PointerTo_wsa__FaultTo(struct soap *soap, struct wsa__EndpointReferenceType *const*a)
 {
     if (!soap_reference(soap, *a, SOAP_TYPE__wsa__FaultTo))
@@ -5056,6 +5046,8 @@ SOAP_FMAC3 char ** SOAP_FMAC4 soap_get_string(struct soap *soap, char **p, const
             return NULL;
     return p;
 }
+
+#endif
 
 #ifdef __cplusplus
 }

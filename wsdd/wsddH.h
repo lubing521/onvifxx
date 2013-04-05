@@ -14,13 +14,13 @@ compiling, linking, and/or using OpenSSL is allowed.
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifndef WITH_NOIDREF
-SOAP_FMAC3 void SOAP_FMAC4 soap_markelement(struct soap*, const void*, int);
-SOAP_FMAC3 int SOAP_FMAC4 soap_putelement(struct soap*, const void*, const char*, int, int);
-SOAP_FMAC3 void *SOAP_FMAC4 soap_getelement(struct soap*, int*);
-SOAP_FMAC3 int SOAP_FMAC4 soap_putindependent(struct soap*);
-SOAP_FMAC3 int SOAP_FMAC4 soap_getindependent(struct soap*);
-#endif
+//#ifndef WITH_NOIDREF
+//SOAP_FMAC3 void SOAP_FMAC4 soap_markelement(struct soap*, const void*, int);
+//SOAP_FMAC3 int SOAP_FMAC4 soap_putelement(struct soap*, const void*, const char*, int, int);
+//SOAP_FMAC3 void *SOAP_FMAC4 soap_getelement(struct soap*, int*);
+//SOAP_FMAC3 int SOAP_FMAC4 soap_putindependent(struct soap*);
+//SOAP_FMAC3 int SOAP_FMAC4 soap_getindependent(struct soap*);
+//#endif
 SOAP_FMAC3 int SOAP_FMAC4 soap_ignore_element(struct soap*);
 
 #ifndef SOAP_TYPE_byte

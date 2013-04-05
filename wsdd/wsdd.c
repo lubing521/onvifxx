@@ -42,12 +42,12 @@ struct Namespace * wsdd_namespaces()
 {
     static SOAP_NMAC struct Namespace rv[] =
     {
-        {"s", "http://schemas.xmlsoap.org/soap/envelope/", "http://www.w3.org/*/soap-envelope", NULL},
-        {"e", "http://schemas.xmlsoap.org/soap/encoding/", "http://www.w3.org/*/soap-encoding", NULL},
+        {"SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", "http://www.w3.org/*/soap-envelope", NULL},
+        {"SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", "http://www.w3.org/*/soap-encoding", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
         {"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
-        {"a", "http://schemas.xmlsoap.org/ws/2004/08/addressing", NULL, NULL},
-        {"d", "http://schemas.xmlsoap.org/ws/2005/04/discovery", NULL, NULL},
+        {"wsa", "http://schemas.xmlsoap.org/ws/2004/08/addressing", NULL, NULL},
+        {"wsdd", "http://schemas.xmlsoap.org/ws/2005/04/discovery", NULL, NULL},
         {"dn", "http://www.onvif.org/ver10/network/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
