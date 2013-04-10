@@ -7,10 +7,14 @@ namespace onvifxx {
 
 struct DiscoveryLookup
 {
-    struct ProbeType { };
-    struct ProbeMatchesType { };
+    struct Probe { };
+    struct ProbeMatch
+    {
+        typedef std::vector<ProbeMatch> List_t;
+    };
 
-    virtual ProbeMatchesType probe(ProbeType arg) = 0;
+    virtual void probe(Probe) = 0;
+    virtual void getProbeMatches(ProbeMatch::List_t &) = 0;
 };
 
 struct RemoteDiscovery
@@ -23,26 +27,33 @@ struct RemoteDiscovery
     virtual ResolveType bye(ByeType arg) = 0;
 };
 
-class DiscoveryClientImpl;
-class DiscoveryClient :
-        virtual private Pimpl<DiscoveryClientImpl>,
+namespace client {
+
+class Discovery :
         protected RemoteDiscovery,
         public DiscoveryLookup
 {
 public:
-    DiscoveryClient();
-    virtual ProbeMatchesType probe(ProbeType arg);
+    Discovery();
+    virtual ~Discovery();
+
+    virtual void probe(Probe);
+    virtual void getProbeMatches(ProbeMatch::List_t &);
 
 protected:
     virtual ResolveType hello(HelloType arg);
     virtual ResolveType bye(ByeType arg);
 
 private:
-    class Impl;
+    struct Impl;
+    Impl * impl_;
 };
 
-class DiscoveryServer :
-        virtual private Pimpl<Server>,
+} // namespace client
+
+namespace server {
+
+class Discovery :
         public RemoteDiscovery,
         protected DiscoveryLookup
 {
@@ -51,8 +62,11 @@ public:
     virtual ResolveType bye(ByeType arg);
 
 protected:
-    virtual ProbeMatchesType probe(ProbeType arg);
+    virtual void probe(Probe);
+    virtual void getProbeMatches(ProbeMatch::List_t &);
 };
+
+} // namespace server
 
 } // namespace onvifxx
 

@@ -1,9 +1,7 @@
 project(${CMAKE_PROJECT_NAME}_gsoap)
 cmake_minimum_required(VERSION 2.6)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-
-find_package(GSOAP REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 aux_source_directory(${PROJECT_BINARY_DIR}/src GSOAP_SOURCES)
 if(NOT "${GSOAP_SOURCES}")
@@ -25,11 +23,8 @@ if(NOT "${GSOAP_SOURCES}")
 endif(NOT "${GSOAP_SOURCES}")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-add_definitions(-DWITH_NOIO -DWITH_SOAPDEFS_H)
 
 file(GLOB GSOAP_HEADERS ${PROJECT_BINARY_DIR}/src/*.h)
-list(APPEND GSOAP_HEADERS ${CMAKE_SOURCE_DIR}/include/soapdefs.h)
-list(APPEND GSOAP_SOURCES stdsoap2.c)
 
 add_library(${PROJECT_NAME} STATIC
 	${GSOAP_SOURCES} ${GSOAP_HEADERS}

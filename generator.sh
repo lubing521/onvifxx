@@ -21,7 +21,7 @@ ln -s /usr/share/gsoap/import/wsdd10.h wsdd.h
 ln -s /usr/share/gsoap/import/wsdx.h wsdx.h
 ln -s /usr/share/gsoap/import/wsa.h wsa.h
 
-wsdl2h -cxP -o /dev/stdout -t $(dirname $0)/typemap.dat \
-		${wsdl_list} 2>/dev/null | soapcpp2  -cnxL$1 -ponvif -f100 -dsrc
+wsdl2h -xP -o /dev/stdout -t $(dirname $0)/typemap.dat \
+		${wsdl_list} 2>/dev/null | soapcpp2  -inxL$1 -ponvif -f100 -dsrc
 sed -i 's/onvif_namespaces/namespaces/' src/onvif.nsmap
 

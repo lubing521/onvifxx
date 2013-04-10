@@ -1,21 +1,28 @@
 #include <onvifxx/discovery.hpp>
-#include "../wsdd/wsdd.h"
+#include "../wsdd/wsdd.hpp"
 
 namespace onvifxx {
+namespace server {
 
-RemoteDiscovery::ResolveType DiscoveryServer::hello(RemoteDiscovery::HelloType arg)
+RemoteDiscovery::ResolveType Discovery::hello(RemoteDiscovery::HelloType arg)
 {
     return RemoteDiscovery::ResolveType();
 }
 
-RemoteDiscovery::ResolveType DiscoveryServer::bye(RemoteDiscovery::ByeType arg)
+RemoteDiscovery::ResolveType Discovery::bye(RemoteDiscovery::ByeType arg)
 {
     return RemoteDiscovery::ResolveType();
 }
 
-DiscoveryLookup::ProbeMatchesType DiscoveryServer::probe(DiscoveryLookup::ProbeType arg)
+void Discovery::probe(Probe probe)
 {
-    return DiscoveryLookup::ProbeMatchesType();
+
 }
 
+void Discovery::getProbeMatches(ProbeMatch::List_t & probeMatches)
+{
+
+}
+
+} // namespace server
 } // namespace onvifxx

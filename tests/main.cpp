@@ -11,31 +11,31 @@ namespace asio = boost::asio;
 typedef asio::ip::udp AsioUdp_t;
 
 
-struct DiscoveryService : onvifxx::DiscoveryServer
-{
-    virtual ResolveType hello(HelloType arg)
-    {
-        return onvifxx::DiscoveryServer::hello(arg);
-    }
+//struct DiscoveryService : onvifxx::Discovery
+//{
+//    virtual ResolveType hello(HelloType arg)
+//    {
+//        return onvifxx::DiscoveryServer::hello(arg);
+//    }
 
-    virtual ResolveType bye(ByeType arg)
-    {
-        return onvifxx::DiscoveryServer::bye(arg);
-    }
+//    virtual ResolveType bye(ByeType arg)
+//    {
+//        return onvifxx::DiscoveryServer::bye(arg);
+//    }
 
-    virtual ProbeMatchesType probe(ProbeType arg)
-    {
-        return onvifxx::DiscoveryServer::probe(arg);
-    }
+//    virtual ProbeMatchesType probe(ProbeType arg)
+//    {
+//        return onvifxx::DiscoveryServer::probe(arg);
+//    }
 
-};
+//};
 
 int main(int argc, char ** argv)
 {
     //DiscoveryService ds;
     try {
-        onvifxx::DiscoveryClient dc;
-        dc.probe(onvifxx::DiscoveryLookup::ProbeType());
+        onvifxx::client::Discovery dc;
+        dc.probe(onvifxx::DiscoveryLookup::Probe());
 
 //        boost::asio::io_service io_service;
 

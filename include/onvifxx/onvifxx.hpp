@@ -2,7 +2,10 @@
 #define ONVIFXX_H
 
 #include <memory>
+#include <vector>
 #include <string>
+
+#define UNUSED(x) (void)x
 
 struct soap;
 
@@ -40,17 +43,15 @@ private:
     int code_;
 };
 
-template<class T>
-class Pimpl
-{
-public:
-    Pimpl() : p_(new T) { }
-    T * impl() { return p_.get(); }
-private:
-    std::shared_ptr<T> p_;
-};
-
-class Server;
+//template<class T>
+//class Pimpl
+//{
+//public:
+//    Pimpl() : p_(new T) { }
+//    T * impl() { return p_.get(); }
+//private:
+//    std::shared_ptr<T> p_;
+//};
 
 } // namespace onvifxx
 

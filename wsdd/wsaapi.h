@@ -49,7 +49,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 #ifndef WSAAPI_H
 #define WSAAPI_H
 
-#include "wsddH.h"	/* replace with soapcpp2-generated *H.h file */
+#include "soapH.h"	/* replace with soapcpp2-generated *H.h file */
 
 #ifdef __cplusplus
 extern "C" {
