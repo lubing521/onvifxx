@@ -1,6 +1,5 @@
 #include <onvifxx/discovery.hpp>
 #include "../wsdd/wsdd.hpp"
-#include "../sock/gsoapsock.hpp"
 
 #include <boost/array.hpp>
 
@@ -27,13 +26,18 @@ Discovery::~Discovery()
 void Discovery::probe(Probe probe)
 {
     const auto id = impl_->genUuid();
-    impl_->probe(Wsdd::MODE_ADHOC, Wsdd::TO_TS, "soap.udp://239.255.255.250:3702",
+    impl_->probe(Wsdd::TO_TS, "soap.udp://239.255.255.250:3702",
                  id, "", "dn:NetworkVideoTransmitter", "", "");
+
+    const auto probe_matches1 = impl_->getProbeMatches();
+    impl_->probeMatches.resize(probe_matches1.size());
+    const auto probe_matches2 = impl_->getProbeMatches();
+    impl_->probeMatches.resize(probe_matches2.size());
 }
 
 void Discovery::getProbeMatches(ProbeMatch::List_t & probeMatches)
 {
-    probeMatches.swap(impl_->probeMatches);
+    probeMatches.assign(impl_->probeMatches.begin(), impl_->probeMatches.end());
 }
 
 

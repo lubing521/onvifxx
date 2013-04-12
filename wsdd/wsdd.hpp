@@ -62,11 +62,11 @@ public:
              const std::string & endpointRef, const std::string & types, const std::string & scopes,
              const std::string & matchBy,    const std::string & xaddrs, uint metadataVersion);
 
-    void probe(Mode mode, To to, const std::string & endpoint, const std::string & messageId,
+    void probe(To to, const std::string & endpoint, const std::string & messageId,
                const std::string & replyTo, const std::string & types, const std::string & scopes,
                const std::string & matchBy);
 
-    void resolve(Mode mode, To to, const std::string & endpoint, const std::string & messageId,
+    void resolve(To to, const std::string & endpoint, const std::string & messageId,
                  const std::string & replyTo, const std::string & endpointRef);
 
     void probeMatches(const std::string & endpoint, const std::string & messageId,

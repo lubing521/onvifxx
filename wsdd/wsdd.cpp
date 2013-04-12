@@ -1,56 +1,78 @@
 #include "wsdd.hpp"
-#include "../wsdd/wsaapi.h"
+#include "wsaapi.h"
+#include "../sock/sock.hpp"
 #include <onvifxx/onvifxx.hpp>
 #include <soapwsddProxy.h>
 
+#include <boost/asio.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <mutex>
 #include <thread>
+#include <sstream>
 
 namespace onvifxx {
 
 const std::string TO_TS_URL = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
 
-struct Wsdd::Impl : wsddProxy
+class ProbeMatches : public wsdd__ProbeMatchesType
 {
-    class ProbeMatches : private wsdd__ProbeMatchesType
+public:
+    ProbeMatches(const Wsdd::ProbeMatch::List_t & probeMatches)
     {
-    public:
-        ProbeMatches(const Wsdd::ProbeMatch::List_t & probeMatches)
-        {
-            this->__sizeProbeMatch = probeMatches.size();
-            this->ProbeMatch = new wsdd__ProbeMatchType[this->__sizeProbeMatch];
+        this->__sizeProbeMatch = probeMatches.size();
+        this->ProbeMatch = new wsdd__ProbeMatchType[this->__sizeProbeMatch];
 
-            for (std::size_t i = 0, I = probeMatches.size(); i < I; ++i) {
-                this->ProbeMatch[i].wsa__EndpointReference.Address =
-                        const_cast<char *>(probeMatches[i].endpoint.first.c_str());
+        for (std::size_t i = 0, I = probeMatches.size(); i < I; ++i) {
+            this->ProbeMatch[i].wsa__EndpointReference.Address =
+                    const_cast<char *>(probeMatches[i].endpoint.first.c_str());
 
-                this->ProbeMatch[i].Types = const_cast<char *>(probeMatches[i].types.c_str());
+            this->ProbeMatch[i].Types = const_cast<char *>(probeMatches[i].types.c_str());
 
-                this->ProbeMatch[i].Scopes = new wsdd__ScopesType;
-                this->ProbeMatch[i].Scopes->__item =
-                        const_cast<char *>(probeMatches[i].scopes.item.c_str());
-                this->ProbeMatch[i].Scopes->MatchBy =
-                        const_cast<char *>(probeMatches[i].scopes.matchBy.c_str());
+            this->ProbeMatch[i].Scopes = new wsdd__ScopesType;
+            this->ProbeMatch[i].Scopes->__item =
+                    const_cast<char *>(probeMatches[i].scopes.item.c_str());
+            this->ProbeMatch[i].Scopes->MatchBy =
+                    const_cast<char *>(probeMatches[i].scopes.matchBy.c_str());
 
-                this->ProbeMatch[i].XAddrs = const_cast<char *>(probeMatches[i].xaddrs.c_str());
+            this->ProbeMatch[i].XAddrs = const_cast<char *>(probeMatches[i].xaddrs.c_str());
 
-                this->ProbeMatch[i].MetadataVersion = probeMatches[i].version;
-            }
+            this->ProbeMatch[i].MetadataVersion = probeMatches[i].version;
         }
+    }
 
-        virtual ~ProbeMatches()
+    virtual ~ProbeMatches()
+    {
+        for (int i = 0; i < this->__sizeProbeMatch; ++i)
+            delete this->ProbeMatch[i].Scopes;
+
+        delete[] this->ProbeMatch;
+    }
+};
+
+class Wsdd::Impl :
+        public wsddProxy,
+        private Sock
+{
+    typedef boost::asio::ip::tcp::iostream TcpIoStream_t;
+    typedef boost::asio::basic_socket_iostream<boost::asio::ip::udp> UdpIoStream_t;
+
+public:
+    Impl() : Sock(this)
+    {
+        static const Namespace namespaces[] =
         {
-            for (int i = 0; i < this->__sizeProbeMatch; ++i)
-                delete this->ProbeMatch[i].Scopes;
-
-            delete[] this->ProbeMatch;
-        }
-
-        operator wsdd__ProbeMatchesType *()
-        {
-            return this;
-        }
-    };
+            {"SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", "http://www.w3.org/*/soap-envelope", NULL},
+            {"SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", "http://www.w3.org/*/soap-encoding", NULL},
+            {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
+            {"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
+            {"wsa", "http://schemas.xmlsoap.org/ws/2004/08/addressing", NULL, NULL},
+            {"wsdd", "http://schemas.xmlsoap.org/ws/2005/04/discovery", NULL, NULL},
+            {"dn", "http://www.onvif.org/ver10/network/wsdl", NULL, NULL},
+            {NULL, NULL, NULL, NULL}
+        };
+        soap_set_namespaces(this, namespaces);
+    }
 
     static uint & instanceId()
     {
@@ -70,23 +92,10 @@ struct Wsdd::Impl : wsddProxy
         return rv;
     }
 
-    void setNamespaces()
+    static std::string toString(const char * s)
     {
-        static const Namespace namespaces[] =
-        {
-            {"SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", "http://www.w3.org/*/soap-envelope", NULL},
-            {"SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", "http://www.w3.org/*/soap-encoding", NULL},
-            {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
-            {"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
-            {"wsa", "http://schemas.xmlsoap.org/ws/2004/08/addressing", NULL, NULL},
-            {"wsdd", "http://schemas.xmlsoap.org/ws/2005/04/discovery", NULL, NULL},
-            {"dn", "http://www.onvif.org/ver10/network/wsdl", NULL, NULL},
-            {NULL, NULL, NULL, NULL}
-        };
-
-        soap_set_namespaces(this, namespaces);
+        return s == nullptr ? std::string() : std::string(s);
     }
-
 
     void setAppSequence()
     {
@@ -131,8 +140,9 @@ struct Wsdd::Impl : wsddProxy
         }
 
         if (soap_header()->wsdd__AppSequence != nullptr) {
+            wsdd__AppSequenceType * seq = soap_header()->wsdd__AppSequence;
             instanceId() = soap_header()->wsdd__AppSequence->InstanceId;
-            sequenceId() = soap_header()->wsdd__AppSequence->SequenceId;
+            sequenceId() = Impl::toString(soap_header()->wsdd__AppSequence->SequenceId);
             messageNumber() = soap_header()->wsdd__AppSequence->MessageNumber;
         }
     }
@@ -141,7 +151,6 @@ struct Wsdd::Impl : wsddProxy
 Wsdd::Wsdd() :
     impl_(new Impl)
 {
-    impl_->setNamespaces();
 }
 
 Wsdd::~Wsdd()
@@ -253,7 +262,7 @@ void Wsdd::bye(Mode mode, const std::string & endpoint, const std::string & mess
         throw SoapException(impl_);
 }
 
-void Wsdd::probe(Mode mode, To to, const std::string & endpoint, const std::string & messageId,
+void Wsdd::probe(To to, const std::string & endpoint, const std::string & messageId,
                  const std::string & replyTo, const std::string & types, const std::string & scopes,
                  const std::string & matchBy)
 {
@@ -278,11 +287,14 @@ void Wsdd::probe(Mode mode, To to, const std::string & endpoint, const std::stri
       req.Scopes = &req_scopes;
     }
 
+    //impl_->connectTo(endpoint);
     if (impl_->send_Probe(endpoint.c_str(), ACTION.c_str(), &req) != 0)
         throw SoapException(impl_);
+
+    //std::cerr << static_cast<std::basic_iostream<char> *>(impl_->os)->rdbuf() << std::endl;
 }
 
-void Wsdd::resolve(Mode mode, To to, const std::string & endpoint, const std::string & messageId,
+void Wsdd::resolve(To to, const std::string & endpoint, const std::string & messageId,
                    const std::string & replyTo, const std::string & endpointRef)
 {
     static const std::string ACTION = SOAP_NAMESPACE_OF_wsdd"/Resolve";
@@ -321,8 +333,8 @@ void Wsdd::probeMatches(const std::string & endpoint, const std::string & messag
     impl_->setAppSequence();
 
     // ProbeMatches
-    Impl::ProbeMatches probe_matches(matches);
-    if (impl_->send_ProbeMatches(endpoint.c_str(), ACTION.c_str(), probe_matches) != 0)
+    ProbeMatches probe_matches(matches);
+    if (impl_->send_ProbeMatches(endpoint.c_str(), ACTION.c_str(), &probe_matches) != 0)
         throw SoapException(impl_);
 
 
@@ -381,7 +393,10 @@ Wsdd::ProbeMatch::List_t Wsdd::getProbeMatches()
 
     // managed mode: receive the matches
     struct __wsdd__ProbeMatches res;
-    soap_default_wsdd__ProbeMatchesType(impl_, res.wsdd__ProbeMatches);
+    wsdd__ProbeMatchesType probe_matches;
+    soap_default_wsdd__ProbeMatchesType(impl_, &probe_matches);
+    res.wsdd__ProbeMatches = &probe_matches;
+
     if (impl_->recv_ProbeMatches(res) != 0)
         throw SoapException(impl_);
 
@@ -395,11 +410,11 @@ Wsdd::ProbeMatch::List_t Wsdd::getProbeMatches()
         auto & probe_match = res.wsdd__ProbeMatches->ProbeMatch[i];
         rv.push_back(ProbeMatch());
 
-        rv.back().endpoint.first    = probe_match.wsa__EndpointReference.Address;
-        rv.back().types             = probe_match.Types;
-        rv.back().scopes.item       = probe_match.Scopes->__item;
-        rv.back().scopes.matchBy    = probe_match.Scopes->MatchBy;
-        rv.back().xaddrs            = probe_match.XAddrs;
+        rv.back().endpoint.first    = Impl::toString(probe_match.wsa__EndpointReference.Address);
+        rv.back().types             = Impl::toString(probe_match.Types);
+        rv.back().scopes.item       = Impl::toString(probe_match.Scopes->__item);
+        rv.back().scopes.matchBy    = Impl::toString(probe_match.Scopes->MatchBy);
+        rv.back().xaddrs            = Impl::toString(probe_match.XAddrs);
         rv.back().version           = probe_match.MetadataVersion;
     }
 
