@@ -17,4 +17,4 @@ private:
 
 } // namespace onvifxx
 
-#endif // ONVIFXX_SoapSock_HPP
+#endif // ONVIFXX_SOCK_HPP

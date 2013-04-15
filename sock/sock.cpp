@@ -1,13 +1,8 @@
 #include "sock.hpp"
+#include "tcp.hpp"
+#include "udp.hpp"
 
 #include <stdsoap2.h>
-
-#include <boost/asio.hpp>
-#include <boost/asio/streambuf.hpp>
-#include <boost/array.hpp>
-
-#include <iostream>
-
 
 namespace onvifxx {
 
@@ -31,12 +26,16 @@ struct Endpoint
         rv.isUdp = false;
 
         for (int i = 0; i < 3; ++i) {
-            if (i == 0)
+            switch (i) {
+            case 0:
                 rv.scheema = HTTP_SCHEEMA;
-            if (i == 1)
+                break;
+            case 1:
                 rv.scheema = HTTPS_SCHEEMA;
-            else
+                break;
+            default:
                 rv.scheema = UDP_SCHEEMA;
+            }
 
             if (url.substr(0, rv.scheema.size()) == rv.scheema) {
                 rv.host = url.substr(rv.scheema.size());
@@ -47,7 +46,7 @@ struct Endpoint
         BOOST_ASSERT(!rv.host.empty());
 
         rv.service = "80";
-        if (rv.service == HTTPS_SCHEEMA)
+        if (rv.scheema == HTTPS_SCHEEMA)
             rv.service = "443";
 
         const auto port_pos = rv.host.find(':');
@@ -56,8 +55,10 @@ struct Endpoint
             rv.host = rv.host.substr(0, port_pos);
         }
 
+        BOOST_ASSERT(!rv.scheema.empty());
         BOOST_ASSERT(!rv.host.empty());
         BOOST_ASSERT(!rv.service.empty());
+        return rv;
     }
 
     ulong inAddr() const
@@ -68,23 +69,6 @@ struct Endpoint
         boost::asio::ip::tcp::endpoint ep = *r.resolve(q);
         return ep.address().to_v4().to_ulong();
     }
-};
-
-class Ip
-{
-
-};
-
-class Tcp
-{
-public:
-
-};
-
-class Udp : public Ip
-{
-public:
-
 };
 
 //void connectTo(const std::string & url)
@@ -154,16 +138,20 @@ struct Sock::Impl
 
     static int open(soap * s, const char * endpoint, const char * host, int port)
     {
-        Impl * impl = static_cast<Impl *>(s->user);
-        BOOST_ASSERT(impl->s == s);
-
-        return SOAP_OK;
+        return connect(s, endpoint, host, port);
     }
 
     static int close(soap * s)
     {
         Impl * impl = static_cast<Impl *>(s->user);
         BOOST_ASSERT(impl->s == s);
+
+        const auto result = impl->ip->close();
+        if (result) {
+            soap_set_sender_error(s, "failed to close", result.message().c_str(),
+                                  impl->ip->isUdp() ? SOAP_UDP_ERROR : SOAP_TCP_ERROR);
+            return SOAP_INVALID_SOCKET;
+        }
 
         return SOAP_OK;
     }
@@ -173,11 +161,28 @@ struct Sock::Impl
         Impl * impl = static_cast<Impl *>(s->user);
         BOOST_ASSERT(impl->s == s);
 
+        const auto result = impl->ip->send(data, n);
+        if (result) {
+            soap_set_sender_error(s, "failed to send", result.message().c_str(),
+                                  impl->ip->isUdp() ? SOAP_UDP_ERROR : SOAP_TCP_ERROR);
+            return SOAP_INVALID_SOCKET;
+        }
+
         return SOAP_OK;
     }
 
     static size_t recv(soap * s, char * data, size_t n)
     {
+        Impl * impl = static_cast<Impl *>(s->user);
+        BOOST_ASSERT(impl->s == s);
+
+        const auto result = impl->ip->recv(data, n);
+        if (result) {
+            soap_set_sender_error(s, "failed to recv", result.message().c_str(),
+                                  impl->ip->isUdp() ? SOAP_UDP_ERROR : SOAP_TCP_ERROR);
+            return SOAP_INVALID_SOCKET;
+        }
+
         return SOAP_OK;
     }
 
@@ -194,11 +199,21 @@ struct Sock::Impl
         Impl * impl = static_cast<Impl *>(s->user);
         BOOST_ASSERT(impl->s == s);
 
-//      const auto ep = Endpoint::fromUrl(endpoint);
+        std::unique_ptr<Ip> ip;
+        if (Endpoint::fromUrl(endpoint).isUdp)
+            ip.reset(new Udp);
+        else
+            ip.reset(new Tcp);
 
+        const auto result = ip->connect(host, port);
+        if (result) {
+            soap_set_sender_error(s, "failed to connect", result.message().c_str(),
+                                  ip->isUdp() ? SOAP_UDP_ERROR : SOAP_TCP_ERROR);
+            return SOAP_INVALID_SOCKET;
+        }
 
-//        s->user = ep.isUdp ? new UdpSock : new TcpSock();
-//        static_cast<Ip>(s->user)->connect(host, port);
+        delete impl->ip;
+        impl->ip = ip.release();
 
         return SOAP_OK;
     }
@@ -326,6 +341,7 @@ Sock::Sock(soap * s) :
 
     s->user = impl_;
     impl_->s = s;
+    impl_->ip = nullptr;
 }
 
 Sock::~Sock()
