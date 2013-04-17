@@ -3,12 +3,13 @@
 
 #include <boost/array.hpp>
 
+#include <sstream>
+
 namespace onvifxx {
 namespace client {
 
 struct Discovery::Impl : Wsdd
 {
-    DiscoveryLookup::ProbeMatch::List_t probeMatches;
 };
 
 Discovery::Discovery() :
@@ -23,21 +24,32 @@ Discovery::~Discovery()
 }
 
 
-void Discovery::probe(Probe probe)
+DiscoveryLookup::ProbeMatch::List_t Discovery::probe(Probe probe)
 {
+    DiscoveryLookup::ProbeMatch::List_t rv;
+
     const auto id = impl_->genUuid();
-    impl_->probe(Wsdd::TO_TS, "soap.udp://239.255.255.250:3702",
-                 id, "", "dn:NetworkVideoTransmitter", "", "");
+    impl_->probe(Wsdd::TO_TS, MULTICAST_ENDPOINT,
+                 id, "", probe.type, probe.scope.item, probe.scope.matchBy);
 
-    const auto probe_matches1 = impl_->getProbeMatches();
-    impl_->probeMatches.resize(probe_matches1.size());
-    const auto probe_matches2 = impl_->getProbeMatches();
-    impl_->probeMatches.resize(probe_matches2.size());
-}
+    while (true) try {
+        for (const auto & probeMatch : impl_->getProbeMatches()) {
+            rv.push_back(DiscoveryLookup::ProbeMatch());
+            rv.back().endpoint = probeMatch.endpoint;
+            rv.back().probe.type = probeMatch.types;
+            rv.back().probe.scope.item = probeMatch.scopes.item;
+            rv.back().probe.scope.matchBy = probeMatch.scopes.matchBy;
+            rv.back().xaddr = probeMatch.xaddrs;
+            rv.back().version = probeMatch.version;
+        }
+    } catch (SoapException & ex) {
+        if (ex.code() == 0)
+            break;
+        else
+            throw;
+    }
 
-void Discovery::getProbeMatches(ProbeMatch::List_t & probeMatches)
-{
-    probeMatches.assign(impl_->probeMatches.begin(), impl_->probeMatches.end());
+    return rv;
 }
 
 

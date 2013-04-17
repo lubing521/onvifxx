@@ -4,12 +4,8 @@
 #include <onvifxx/onvifxx.hpp>
 #include <soapwsddProxy.h>
 
-#include <boost/asio.hpp>
-#include <boost/lexical_cast.hpp>
-
 #include <mutex>
 #include <thread>
-#include <sstream>
 
 namespace onvifxx {
 
@@ -51,19 +47,18 @@ public:
 };
 
 class Wsdd::Impl :
-        public wsddProxy,
-        private Sock
+        public wsddProxy
 {
-    typedef boost::asio::ip::tcp::iostream TcpIoStream_t;
-    typedef boost::asio::basic_socket_iostream<boost::asio::ip::udp> UdpIoStream_t;
+     static const uint SEND_TIMEOUT = 1; // second
+    static const uint RECV_TIMEOUT = 1; // second
 
 public:
-    Impl() : Sock(this)
+    Impl()
     {
         static const Namespace namespaces[] =
         {
-            {"SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", "http://www.w3.org/*/soap-envelope", NULL},
-            {"SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", "http://www.w3.org/*/soap-encoding", NULL},
+            {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://www.w3.org/*/soap-envelope", NULL},
+            {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://www.w3.org/*/soap-encoding", NULL},
             {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
             {"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
             {"wsa", "http://schemas.xmlsoap.org/ws/2004/08/addressing", NULL, NULL},
@@ -72,6 +67,9 @@ public:
             {NULL, NULL, NULL, NULL}
         };
         soap_set_namespaces(this, namespaces);
+
+        send_timeout = SEND_TIMEOUT;
+        recv_timeout = RECV_TIMEOUT;
     }
 
     static uint & instanceId()
@@ -287,11 +285,9 @@ void Wsdd::probe(To to, const std::string & endpoint, const std::string & messag
       req.Scopes = &req_scopes;
     }
 
-    //impl_->connectTo(endpoint);
+
     if (impl_->send_Probe(endpoint.c_str(), ACTION.c_str(), &req) != 0)
         throw SoapException(impl_);
-
-    //std::cerr << static_cast<std::basic_iostream<char> *>(impl_->os)->rdbuf() << std::endl;
 }
 
 void Wsdd::resolve(To to, const std::string & endpoint, const std::string & messageId,

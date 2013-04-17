@@ -7,14 +7,25 @@ namespace onvifxx {
 
 struct DiscoveryLookup
 {
-    struct Probe { };
+    struct Probe
+    {
+        std::string type;
+        Scope scope;
+    };
+
     struct ProbeMatch
     {
+        typedef std::pair<std::string, unsigned short> Endpoint_t;
+
+        Endpoint_t endpoint;
+        Probe probe;
+        std::string xaddr;
+        uint version;
+
         typedef std::vector<ProbeMatch> List_t;
     };
 
-    virtual void probe(Probe) = 0;
-    virtual void getProbeMatches(ProbeMatch::List_t &) = 0;
+    virtual ProbeMatch::List_t probe(Probe) = 0;
 };
 
 struct RemoteDiscovery
@@ -37,8 +48,7 @@ public:
     Discovery();
     virtual ~Discovery();
 
-    virtual void probe(Probe);
-    virtual void getProbeMatches(ProbeMatch::List_t &);
+    virtual ProbeMatch::List_t probe(Probe);
 
 protected:
     virtual ResolveType hello(HelloType arg);
@@ -62,8 +72,7 @@ public:
     virtual ResolveType bye(ByeType arg);
 
 protected:
-    virtual void probe(Probe);
-    virtual void getProbeMatches(ProbeMatch::List_t &);
+    virtual ProbeMatch::List_t probe(Probe);
 };
 
 } // namespace server

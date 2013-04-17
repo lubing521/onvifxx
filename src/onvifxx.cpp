@@ -23,11 +23,21 @@ const char * Exception::what() const noexcept
     return msg_.c_str();
 }
 
-SoapException::SoapException(soap * s)
+SoapException::SoapException(soap * s) :
+    code_(-1)
 {
-    char buf[1024];
-    soap_sprint_fault(s, buf, sizeof(buf));
-    message().assign(buf);
+    if (s != nullptr) {
+        char buf[1024];
+        soap_sprint_fault(s, buf, sizeof(buf));
+        message().assign(buf);
+
+        code_ = s->errnum;
+    }
+}
+
+int SoapException::code() const
+{
+    return code_;
 }
 
 UnixException::UnixException(int code)

@@ -14,15 +14,11 @@ RemoteDiscovery::ResolveType Discovery::bye(RemoteDiscovery::ByeType arg)
     return RemoteDiscovery::ResolveType();
 }
 
-void Discovery::probe(Probe probe)
+DiscoveryLookup::ProbeMatch::List_t Discovery::probe(Probe probe)
 {
-
+    return DiscoveryLookup::ProbeMatch::List_t();
 }
 
-void Discovery::getProbeMatches(ProbeMatch::List_t & probeMatches)
-{
-
-}
 
 } // namespace server
 } // namespace onvifxx

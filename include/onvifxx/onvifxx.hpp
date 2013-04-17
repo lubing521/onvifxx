@@ -11,6 +11,15 @@ struct soap;
 
 namespace onvifxx {
 
+
+static const std::string MULTICAST_ENDPOINT = "soap.udp://239.255.255.250:3702";
+
+struct Scope
+{
+    std::string item;
+    std::string matchBy;
+};
+
 class Exception : public std::exception
 {
 public:
@@ -30,6 +39,11 @@ class SoapException : public Exception
 {
 public:
     SoapException(soap * s);
+
+    int code() const;
+
+private:
+    int code_;
 };
 
 class UnixException : public Exception
