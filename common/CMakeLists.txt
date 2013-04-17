@@ -1,10 +1,10 @@
-project(${CMAKE_PROJECT_NAME}_gsoap)
+project(${CMAKE_PROJECT_NAME}_common)
 cmake_minimum_required(VERSION 2.6)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
-aux_source_directory(${PROJECT_BINARY_DIR}/src GSOAP_SOURCES)
-if(NOT "${GSOAP_SOURCES}")
+aux_source_directory(${PROJECT_BINARY_DIR}/src COMMON_SOURCES)
+if(NOT "${COMMON_SOURCES}")
 	if(ONLY_SERVER)
 		set(GENERATOR_OPTION "S")
 	elseif(ONLY_CLIENT)
@@ -19,13 +19,13 @@ if(NOT "${GSOAP_SOURCES}")
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
 
-	aux_source_directory(${PROJECT_BINARY_DIR}/src GSOAP_SOURCES)
-endif(NOT "${GSOAP_SOURCES}")
+	aux_source_directory(${PROJECT_BINARY_DIR}/src COMMON_SOURCES)
+endif(NOT "${COMMON_SOURCES}")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-file(GLOB GSOAP_HEADERS ${PROJECT_BINARY_DIR}/src/*.h)
+file(GLOB COMMON_HEADERS ${PROJECT_BINARY_DIR}/src/*.h)
 
 add_library(${PROJECT_NAME} STATIC
-	${GSOAP_SOURCES} ${GSOAP_HEADERS}
+	${COMMON_SOURCES} ${COMMON_HEADERS}
 )

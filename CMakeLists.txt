@@ -35,11 +35,11 @@ set(GSOAP_LOCATION "/usr")
 find_package(GSOAP REQUIRED)
 
 add_subdirectory(sock)
-add_subdirectory(gsoap)
+add_subdirectory(common)
 add_subdirectory(wsdd)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${CMAKE_BINARY_DIR}/gsoap/src)
+include_directories(${CMAKE_BINARY_DIR}/common/src)
 
 file(GLOB XML_FILES xml/*.*)
 file(GLOB_RECURSE HEADERS  ${PROJECT_SOURCE_DIR}/include/*.hpp)
@@ -49,7 +49,9 @@ add_library(${PROJECT_NAME} SHARED
 	generator.sh typemap.dat
 )
 target_link_libraries(${PROJECT_NAME}
-	${PROJECT_NAME}_sock ${PROJECT_NAME}_gsoap ${PROJECT_NAME}_wsdd
+	${PROJECT_NAME}_sock
+	${PROJECT_NAME}_common
+	${PROJECT_NAME}_wsdd
 	${Boost_LIBRARIES} gsoap++)
 
 if(WITH_TESTS)
