@@ -1,5 +1,12 @@
 #include <onvifxx/onvifxx.hpp>
-#include <onvif.nsmap>
+#include <OnvifActionEngineBindingProxy.h>
+#include <Onvif.nsmap>
+
+extern "C" {
+
+auto namespaces = Onvif_namespaces;
+
+} // extern "C"
 
 namespace onvifxx {
 

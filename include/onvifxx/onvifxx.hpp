@@ -12,13 +12,7 @@ struct soap;
 namespace onvifxx {
 
 
-static const std::string MULTICAST_ENDPOINT = "soap.udp://239.255.255.250:3702";
-
-struct Scope
-{
-    std::string item;
-    std::string matchBy;
-};
+static const std::string WSDD_URL = "soap.udp://239.255.255.250:3702";
 
 class Exception : public std::exception
 {
@@ -56,6 +50,10 @@ public:
 private:
     int code_;
 };
+
+
+template<class T>
+std::unique_ptr<T> proxy();
 
 //template<class T>
 //class Pimpl

@@ -33,15 +33,9 @@ typedef asio::ip::udp AsioUdp_t;
 int main(int argc, char ** argv)
 {
     try {
-        onvifxx::client::Discovery dc;
-        onvifxx::DiscoveryLookup::Probe probe;
-        probe.type = "dn:NetworkVideoTransmitter";
-        for (const auto & probeMatch : dc.probe(probe)) {
-             std::cout << probeMatch.endpoint.first << ":" << probeMatch.endpoint.second << std::endl;
-             std::cout << probeMatch.probe.type << " " << probeMatch.probe.scope.item << " "  << probeMatch.probe.scope.matchBy << std::endl;
-             std::cout << probeMatch.xaddr << std::endl;
-             std::cout << probeMatch.version << std::endl;
-             std::cout << std::endl;
+        auto dlp = onvifxx::proxy<onvifxx::DiscoveryLookup>();
+        for (const auto & match : dlp->probe("dn:NetworkVideoTransmitter")) {
+             std::cout << match << std::endl;
         }
     } catch (const onvifxx::UnixException & ex) {
         std::cerr << "Error (" << ex.code() << ") " << ex.what() << "!" << std::endl;

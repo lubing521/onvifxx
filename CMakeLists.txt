@@ -18,14 +18,6 @@ endif(ONLY_SERVER AND ONLY_CLIENT)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++0x")
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
-if(ONLY_SERVER)
-	file(GLOB SOURCES src/*_s.cpp)
-elseif(ONLY_CLIENT)
-	file(GLOB SOURCES src/*_c.cpp)
-else(ONLY_SERVER)
-	aux_source_directory(${PROJECT_SOURCE_DIR}/src SOURCES)
-endif(ONLY_SERVER)
-
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
@@ -34,24 +26,31 @@ find_package(Boost 1.49.0 COMPONENTS system)
 set(GSOAP_LOCATION "/usr")
 find_package(GSOAP REQUIRED)
 
-add_subdirectory(sock)
-add_subdirectory(common)
-add_subdirectory(wsdd)
+if(ONLY_SERVER)
+	file(GLOB SOURCES src/*_s.cpp)
+elseif(ONLY_CLIENT)
+	file(GLOB SOURCES src/*_c.cpp)
+else(ONLY_SERVER)
+	aux_source_directory(${PROJECT_SOURCE_DIR}/src SOURCES)
+endif(ONLY_SERVER)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${CMAKE_BINARY_DIR}/common/src)
 
-file(GLOB XML_FILES xml/*.*)
+add_subdirectory(xml)
+#add_subdirectory(sock)
+add_subdirectory(onvif)
+
+include_directories(${PROJECT_SOURCE_DIR}/include ${ONVIF_INCLUDE_DIR})
+
 file(GLOB_RECURSE HEADERS  ${PROJECT_SOURCE_DIR}/include/*.hpp)
+aux_source_directory(${PROJECT_SOURCE_DIR} SOURCES)
 
 add_library(${PROJECT_NAME} SHARED
-	${SOURCES} ${HEADERS} ${XML_FILES}
-	generator.sh typemap.dat
+	${HEADERS} ${SOURCES}
 )
+
 target_link_libraries(${PROJECT_NAME}
-	${PROJECT_NAME}_sock
-	${PROJECT_NAME}_common
-	${PROJECT_NAME}_wsdd
+#	${PROJECT_NAME}_sock
+	${PROJECT_NAME}_onvif
 	${Boost_LIBRARIES} gsoap++)
 
 if(WITH_TESTS)
