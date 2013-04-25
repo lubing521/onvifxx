@@ -1,4 +1,4 @@
-#include <onvifxx/discovery.hpp>
+#include <onvifxx/discoverylookup.hpp>
 #include <OnvifDiscoveryLookupBindingProxy.h>
 
 #include <mutex>

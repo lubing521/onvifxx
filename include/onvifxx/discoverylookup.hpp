@@ -1,5 +1,5 @@
-#ifndef ONVIF_DISCOVERY_H
-#define ONVIF_DISCOVERY_H
+#ifndef ONVIF_DISCOVERY_HPP
+#define ONVIF_DISCOVERY_HPP
 
 #include "onvifxx.hpp"
 
@@ -20,4 +20,4 @@ struct RemoteDiscovery
 
 } // namespace onvifxx
 
-#endif // ONVIF_DISCOVERY_H
+#endif // ONVIF_DISCOVERY_HPP
