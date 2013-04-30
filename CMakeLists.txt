@@ -26,10 +26,11 @@ find_package(Boost 1.49.0 COMPONENTS system)
 set(GSOAP_LOCATION "/usr")
 find_package(GSOAP REQUIRED)
 
+
 if(ONLY_SERVER)
-	file(GLOB SOURCES src/*_s.cpp)
+	file(GLOB SOURCES src/*_service.cpp)
 elseif(ONLY_CLIENT)
-	file(GLOB SOURCES src/*_c.cpp)
+	file(GLOB SOURCES src/*_prxy.cpp)
 else(ONLY_SERVER)
 	aux_source_directory(${PROJECT_SOURCE_DIR}/src SOURCES)
 endif(ONLY_SERVER)
@@ -38,8 +39,9 @@ endif(ONLY_SERVER)
 add_subdirectory(xml)
 #add_subdirectory(sock)
 add_subdirectory(onvif)
+add_subdirectory(wsdd)
 
-include_directories(${PROJECT_SOURCE_DIR}/include ${ONVIF_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/include ${ONVIF_INCLUDE_DIR} ${WSDD_INCLUDE_DIR})
 
 file(GLOB_RECURSE HEADERS  ${PROJECT_SOURCE_DIR}/include/*.hpp)
 aux_source_directory(${PROJECT_SOURCE_DIR} SOURCES)
@@ -51,7 +53,8 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
 #	${PROJECT_NAME}_sock
 	${PROJECT_NAME}_onvif
-	${Boost_LIBRARIES} gsoap++)
+#	${PROJECT_NAME}_wsdd
+	${Boost_LIBRARIES} ${GSOAP_LIBRARIES})
 
 if(WITH_TESTS)
 	 add_subdirectory(tests)

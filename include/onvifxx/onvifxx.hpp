@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #define UNUSED(x) (void)x
 
@@ -54,6 +55,51 @@ private:
 
 template<class T>
 std::unique_ptr<T> proxy();
+
+template<class T>
+std::unique_ptr<T> service();
+
+class ServiceBase
+{
+protected:
+    struct Engine
+    {
+        virtual	int serve() = 0;
+        virtual	int accept() = 0;
+
+        virtual	void print() = 0;
+    };
+
+    virtual void run(Engine * engine);
+};
+
+template<class T>
+class Service :
+        private ServiceBase,
+        public std::unique_ptr<T>
+{
+    typedef std::unique_ptr<T> P_t;
+
+
+public:
+    struct Engine : T, ServiceBase::Engine
+    {
+        virtual	int serve() { return T::serve(); }
+        virtual	int accept() { return T::accept(); }
+
+        virtual	void print()
+        {
+            std::cerr << "!!!!!!!!!!!!!!!!!" << std::endl;
+        }
+    };
+
+    virtual void run(Engine * engine = nullptr)
+    {
+        P_t::reset(service<T>().release());
+        ServiceBase::run(dynamic_cast<ServiceBase::Engine *>(P_t::get()));
+    }
+};
+
 
 //template<class T>
 //class Pimpl

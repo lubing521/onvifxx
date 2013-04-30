@@ -27,13 +27,13 @@ find_path(GSOAP_IMPORT_DIR
 # GSOAP Libraries
 # -----------------------------------------------------
 find_library(GSOAP_LIBRARIES
-	NAMES gsoap
+	NAMES gsoap++
 	HINTS ${GSOAP_LOCATION}/lib ${GSOAP_LOCATION}/lib64
 		  ${GSOAP_LOCATION}/lib32
 	DOC "The main gsoap library"
 )
 find_library(GSOAP_SSL_LIBRARIES
-	NAMES gsoapssl
+	NAMES gsoapssl++
 	HINTS ${GSOAP_LOCATION}/lib ${GSOAP_LOCATION}/lib64
 		  ${GSOAP_LOCATION}/lib32
 	DOC "The ssl gsoap library"

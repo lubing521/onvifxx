@@ -1,0 +1,5 @@
+# Written by Stanislav Shikhalev <stansage@ya.ru>
+# Copyright (C) 2013 Sigrand LLC <sigrand.com>
+
+wsa     = "http://schemas.xmlsoap.org/ws/2004/08/addressing"
+wsdd    = "http://schemas.xmlsoap.org/ws/2005/04/discovery"

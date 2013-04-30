@@ -1,4 +1,4 @@
-#include <onvifxx/discovery.hpp>
+#include <onvifxx/discoverylookup.hpp>
 //#include <onvifxx/media.hpp>
 
 #include <iostream>
@@ -30,11 +30,20 @@ typedef asio::ip::udp AsioUdp_t;
 
 //};
 
+struct DiscoveryLookup : onvifxx::DiscoveryLookup
+{
+
+};
+
 int main(int argc, char ** argv)
 {
     try {
+        auto dls = onvifxx::Service<onvifxx::DiscoveryLookup>();
+        dls.run();
+
+        std::string types = "dn:NetworkVideoTransmitter";
         auto dlp = onvifxx::proxy<onvifxx::DiscoveryLookup>();
-        for (const auto & match : dlp->probe("dn:NetworkVideoTransmitter")) {
+        for (const auto & match : dlp->probe(&types, nullptr)) {
              std::cout << match << std::endl;
         }
     } catch (const onvifxx::UnixException & ex) {

@@ -3,10 +3,7 @@
 
 xop     = "http://www.w3.org/2004/08/xop/include"
 wsa5    = <http://www.w3.org/2005/08/addressing>
-env     = "http://schemas.xmlsoap.org/soap/envelope/"
-wsa     = "http://schemas.xmlsoap.org/ws/2004/08/addressing"
-wsdd    = "http://schemas.xmlsoap.org/ws/2005/04/discovery"
-
+env		= <http://schemas.xmlsoap.org/soap/envelope/>
 
 #	OASIS recommended prefixes
 wsnt    = "http://docs.oasis-open.org/wsn/b-2"
@@ -43,7 +40,3 @@ tevpp   = "http://www.onvif.org/ver10/events/wsdl/PullPointBinding"
 tevpps  = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
 tevcpp  = "http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
 tevpsm  = "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
-
-dn      = "http://www.onvif.org/ver10/network/wsdl"
-dnrd    = "http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
-dndl    = "http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"

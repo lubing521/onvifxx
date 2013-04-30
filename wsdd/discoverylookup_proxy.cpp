@@ -1,5 +1,6 @@
 #include <onvifxx/discoverylookup.hpp>
-#include <OnvifDiscoveryLookupBindingProxy.h>
+#include <WsddDiscoveryLookupBindingProxy.h>
+#include "wsa.hpp"
 
 #include <mutex>
 #include <thread>
@@ -17,12 +18,16 @@ class DiscoveryLookupProxy :
 
     const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
 
+
 public:
-    DiscoveryLookupProxy() : DiscoveryLookupBindingProxy(WSDD_URL.c_str(), SOAP_IO_UDP)
+    DiscoveryLookupProxy() :
+        DiscoveryLookupBindingProxy(WSDD_URL.c_str(), SOAP_IO_UDP),
+        wsa_(this)
     {
         send_timeout = SEND_TIMEOUT;
         recv_timeout = RECV_TIMEOUT;
     }
+
 
     static uint & instanceId()
     {
@@ -32,7 +37,7 @@ public:
 
     static std::string & sequenceId()
     {
-        static std::string rv;
+        static std::string  rv;
         return rv;
     }
 
@@ -55,52 +60,45 @@ public:
     }
 
 
-    std::string genUuid()
-    {
-        return std::string();
-    }
-
 
     void checkHeader(const std::string & faultMessage)
     {
         // check WSA
-//        if (soap_wsa_check(this))
-//            throw SoapException(this);
+        if (soap_header() == nullptr) {
+            if (wsa_.faultSubcode(1, "checkHeader", faultMessage.c_str(), "") != 0)
+                throw SoapException(this);
+        }
 
-//        // check WSDD header
-//        if (soap_header() == nullptr) {
-//            if (soap_wsa_sender_fault(this, faultMessage.c_str(), nullptr) != 0)
-//                throw SoapException(this);
-//        }
+        if (soap_header()->wsdd__AppSequence != nullptr) {
+            wsdd__AppSequenceType * seq = soap_header()->wsdd__AppSequence;
+            instanceId() = seq->InstanceId;
+            messageNumber() = seq->MessageNumber;
+            if (seq->SequenceId != nullptr)
+                sequenceId() = *seq->SequenceId;
+        }
     }
 
-    virtual std::vector<std::string> probe(const std::string & type)
+    virtual std::vector<std::string> probe(std::string * types, Scopes_t * scopes)
     {
-        static const std::string ACTION = SOAP_NAMESPACE_OF_wsdd"/Probe";
-
-//        const auto messageId = genUuid();
+        const auto messageId = wsa_.randUuid();
 
         // SOAP Header
-//        const std::string & dst = TO_TS_URL;
-//        soap_wsa_request(this, messageId.c_str(), dst.c_str(), ACTION.c_str());
-//        soap_wsa_add_ReplyTo(this, "");
+        const std::string & dst = TO_TS_URL;
+        wsa_.request(messageId, dst, "");
+        wsa_.addReplyTo("");
 
         /* Probe */
         wsdd__ProbeType req;
         req.soap_default(this);
-        if (!type.empty()) {
-            auto types = type;
-            req.wsdd__Types = &types;
-        }
+        req.wsdd__Types = types;
 
-//        wsdd__ScopesType req_scopes;
-//        req_scopes.soap_default(impl_);
-//        if (arg.scopes) {
-//            req_scopes.__item = arg.scopes->item;
-//            if (arg.scopes->matchBy)
-//                req_scopes.MatchBy = arg.scopes->matchBy.get();
-//            req.wsdd__Scopes = &req_scopes;
-//        }
+        wsdd__ScopesType req_scopes;
+        req_scopes.soap_default(this);
+        if (scopes != nullptr) {
+            req_scopes.__item = scopes->first;
+            req_scopes.MatchBy = scopes->second;
+            req.wsdd__Scopes = &req_scopes;
+        }
 
         wsdd__ProbeMatchesType res;
         res.soap_default(this);
@@ -120,6 +118,8 @@ public:
         return rv;
     }
 
+private:
+    Wsa wsa_;
 };
 
 
