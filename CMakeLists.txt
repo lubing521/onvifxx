@@ -1,7 +1,9 @@
 project(onvifxx)
 cmake_minimum_required(VERSION 2.6)
 
-set(CMAKE_BUILD_TYPE Debug)
+if(ENABLE_DEBUG)
+	set(CMAKE_BUILD_TYPE Debug)
+endif()
 
 if(NOT CMAKE_COMPILER_IS_GNUCXX)
 	message(FATAL_ERROR "Use gcc compiler!")
@@ -21,16 +23,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.49.0 COMPONENTS system)
+find_package(Boost 1.49.0 REQUIRED COMPONENTS system)
+message(STATUS "Found Boost 1.49 in (${Boost_INCLUDE_DIR} ${Boost_LIBRARY_DIRS})")
+
 
 set(GSOAP_LOCATION "/usr")
-find_package(GSOAP REQUIRED)
-
+find_package(GSOAP 2.8.7 REQUIRED)
+message(STATUS "The GSOAP version: ${GSOAP_VERSION}")
+message(STATUS "The GSOAP include directory: ${GSOAP_INCLUDE_DIR}")
+message(STATUS "The GSOAP libraries: ${GSOAP_LIBRARIES}")
 
 if(ONLY_SERVER)
 	file(GLOB SOURCES src/*_service.cpp)
 elseif(ONLY_CLIENT)
-	file(GLOB SOURCES src/*_prxy.cpp)
+	file(GLOB SOURCES src/*_proxy.cpp)
 else(ONLY_SERVER)
 	aux_source_directory(${PROJECT_SOURCE_DIR}/src SOURCES)
 endif(ONLY_SERVER)
