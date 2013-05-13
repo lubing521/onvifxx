@@ -27,7 +27,7 @@ find_package(Boost 1.49.0 REQUIRED COMPONENTS system)
 message(STATUS "Found Boost 1.49 in (${Boost_INCLUDE_DIR} ${Boost_LIBRARY_DIRS})")
 
 
-set(GSOAP_LOCATION "/usr")
+set(GSOAP_DIR "/usr")
 find_package(GSOAP 2.8.7 REQUIRED)
 message(STATUS "The GSOAP version: ${GSOAP_VERSION}")
 message(STATUS "The GSOAP include directory: ${GSOAP_INCLUDE_DIR}")
