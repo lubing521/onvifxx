@@ -21,6 +21,11 @@ if(NOT IS_DIRECTORY ${WSDD_SOURCE_DIR})
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
 
+	execute_process(
+		COMMAND ln -s ${GSOAP_IMPORT_DIR}/soap12.h soap12.h
+		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+	)
+
 	file(APPEND ${PROJECT_BINARY_DIR}/h
 		"struct SOAP_ENV__Header {\n"
 			"std::string wsa__MessageID;\n"
@@ -35,16 +40,20 @@ if(NOT IS_DIRECTORY ${WSDD_SOURCE_DIR})
 	)
 
 	execute_process(
-		COMMAND ${GSOAP_SOAPCPP2} -2abinxL -dsrc -pWsdd h
+		COMMAND ${GSOAP_SOAPCPP2} -abinxL -dsrc -pWsdd h
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
 
 	aux_source_directory(${WSDD_SOURCE_DIR} WSDD_SOURCES)
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${GSOAP_IMPORT_DIR}/../plugin)
-include_directories(${WSDD_SOURCE_DIR})
+
+include_directories(
+	${CMAKE_SOURCE_DIR}/include
+	${WSDD_SOURCE_DIR}
+	${GSOAP_INCLUDE_DIR}
+	${GSOAP_IMPORT_DIR}/../plugin
+)
 
 file(GLOB WSDD_HEADERS ${WSDD_SOURCE_DIR}/*.h)
 if(ONLY_SERVER)

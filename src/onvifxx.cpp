@@ -1,11 +1,7 @@
 #include <onvifxx/onvifxx.hpp>
 #include <Onvif.nsmap>
 
-extern "C" {
-
-auto namespaces = Onvif_namespaces;
-
-} // extern "C"
+struct Namespace namespaces[] = {};
 
 namespace onvifxx {
 
@@ -19,12 +15,16 @@ Exception::Exception(const char * msg) :
 
 }
 
+Exception::~Exception() throw()
+{
+}
+
 std::string & Exception::message()
 {
     return msg_;
 }
 
-const char * Exception::what() const noexcept
+const char * Exception::what() const throw()
 {
     return msg_.c_str();
 }

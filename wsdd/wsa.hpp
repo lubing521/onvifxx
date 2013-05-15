@@ -19,7 +19,7 @@
 # define SOAP_WSA__(prefix,member) prefix##wsa__##member
 #endif
 
-#include <string>
+#include <onvifxx/onvifxx.hpp>
 
 class Wsa
 {

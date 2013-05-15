@@ -1,4 +1,4 @@
-#include <onvifxx/discoverylookup.hpp>
+#include <onvifxx/remotediscovery.hpp>
 //#include <onvifxx/media.hpp>
 
 #include <iostream>
@@ -30,22 +30,24 @@ typedef asio::ip::udp AsioUdp_t;
 
 //};
 
-struct DiscoveryLookup : onvifxx::DiscoveryLookup
+struct RemoteDiscovery : onvifxx::RemoteDiscovery
 {
-
+	typedef onvifxx::Service<RemoteDiscovery> Service_t;
 };
 
 int main(int argc, char ** argv)
 {
     try {
-        auto dls = onvifxx::Service<onvifxx::DiscoveryLookup>();
-        dls.run();
+	
+        RemoteDiscovery::Service_t service;
+        service.run();
 
         std::string types = "dn:NetworkVideoTransmitter";
-        auto dlp = onvifxx::proxy<onvifxx::DiscoveryLookup>();
-        for (const auto & match : dlp->probe(&types, nullptr)) {
-             std::cout << match << std::endl;
-        }
+        onvifxx::RemoteDiscovery * proxy = onvifxx::proxy<onvifxx::RemoteDiscovery>();
+	onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
+	std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
+	delete proxy;
+
     } catch (const onvifxx::UnixException & ex) {
         std::cerr << "Error (" << ex.code() << ") " << ex.what() << "!" << std::endl;
         return 1;

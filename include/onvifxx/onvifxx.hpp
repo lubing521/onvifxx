@@ -10,6 +10,22 @@
 
 struct soap;
 
+#if __GNUC_MINOR__ < 6
+    #define noexcept throw()
+
+    const class {                       // this is a const object...
+    public:
+        template<class T>               // convertible to any type
+        operator T*() const             // of null non-member
+        { return 0; }                   // pointer...
+        template<class C, class T>      // or any type of null
+        operator T C::*() const         // member pointer...
+        { return 0; }
+    private:
+        void operator&() const;         // whose address can't be taken
+    } nullptr = {};                     // and whose name is nullptr
+#endif
+
 namespace onvifxx {
 
 
@@ -20,7 +36,8 @@ class Exception : public std::exception
 public:
     Exception();
     Exception(const char * msg);
-    virtual const char* what() const noexcept;
+    virtual ~Exception() throw();
+    virtual const char * what() const throw();
 
 protected:
     std::string & message();
@@ -54,10 +71,10 @@ private:
 
 
 template<class T>
-std::unique_ptr<T> proxy();
+T * proxy();
 
 template<class T>
-std::unique_ptr<T> service();
+T * service();
 
 class ServiceBase
 {
@@ -75,11 +92,8 @@ protected:
 
 template<class T>
 class Service :
-        private ServiceBase,
-        public std::unique_ptr<T>
+        private ServiceBase
 {
-    typedef std::unique_ptr<T> P_t;
-
 
 public:
     struct Engine : T, ServiceBase::Engine
@@ -95,8 +109,7 @@ public:
 
     virtual void run(Engine * engine = nullptr)
     {
-        P_t::reset(service<T>().release());
-        ServiceBase::run(dynamic_cast<ServiceBase::Engine *>(P_t::get()));
+        ServiceBase::run(dynamic_cast<ServiceBase::Engine *>(this));
     }
 };
 

@@ -26,15 +26,23 @@ if(NOT IS_DIRECTORY ${ONVIF_SOURCE_DIR})
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
 
+        execute_process(
+                COMMAND ln -s ${GSOAP_IMPORT_DIR}/soap12.h soap12.h
+                WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+        )
+
 	execute_process(
-		COMMAND ${GSOAP_SOAPCPP2} -2abinxL -f100 -dsrc -pOnvif h
+		COMMAND ${GSOAP_SOAPCPP2} -abinxL -f100 -dsrc -pOnvif h
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
 
 	aux_source_directory(${ONVIF_SOURCE_DIR} ONVIF_SOURCES)
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(
+	${CMAKE_SOURCE_DIR}/include
+	${GSOAP_INCLUDE_DIR}
+)
 
 file(GLOB ONVIF_HEADERS ${ONVIF_SOURCE_DIR}/*.h)
 
