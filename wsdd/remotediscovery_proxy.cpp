@@ -1,27 +1,23 @@
-#include <onvifxx/discoverylookup.hpp>
-#include <WsddDiscoveryLookupBindingProxy.h>
+#include <onvifxx/remotediscovery.hpp>
+#include <WsddRemoteDiscoveryBindingProxy.h>
 #include "wsa.hpp"
-
-#include <mutex>
-#include <thread>
 
 namespace onvifxx {
 
-class DiscoveryLookupProxy :
-        public DiscoveryLookup,
-        private DiscoveryLookupBindingProxy
+const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
+
+class RemoteDiscoveryProxy :
+        public RemoteDiscovery,
+        private RemoteDiscoveryBindingProxy
 {
     static const uint SEND_TIMEOUT = 1; // second
     static const uint RECV_TIMEOUT = 1; // second
 
     static const uint APP_MAX_DELAY = 100;
 
-    const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
-
-
 public:
-    DiscoveryLookupProxy() :
-        DiscoveryLookupBindingProxy(WSDD_URL.c_str(), SOAP_IO_UDP),
+    RemoteDiscoveryProxy() :
+        RemoteDiscoveryBindingProxy(WSDD_URL.c_str(), SOAP_IO_UDP),
         wsa_(this)
     {
         send_timeout = SEND_TIMEOUT;
@@ -55,7 +51,7 @@ public:
 
     void delay()
     {
-        const auto timeout = 1000 * (soap_random % APP_MAX_DELAY);
+        const unsigned int timeout = 1000 * (soap_random % APP_MAX_DELAY);
         ::usleep(timeout);
     }
 
@@ -78,9 +74,17 @@ public:
         }
     }
 
-    virtual std::vector<std::string> probe(std::string * types, Scopes_t * scopes)
+    virtual void hello()
     {
-        const auto messageId = wsa_.randUuid();
+    }
+
+    virtual void bye()
+    {
+    }
+
+    virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes)
+    {
+        const std::string messageId = wsa_.randUuid();
 
         // SOAP Header
         const std::string & dst = TO_TS_URL;
@@ -90,14 +94,14 @@ public:
         /* Probe */
         wsdd__ProbeType req;
         req.soap_default(this);
-        req.wsdd__Types = types;
+        req.Types = types;
 
         wsdd__ScopesType req_scopes;
         req_scopes.soap_default(this);
         if (scopes != nullptr) {
             req_scopes.__item = scopes->first;
             req_scopes.MatchBy = scopes->second;
-            req.wsdd__Scopes = &req_scopes;
+            req.Scopes = &req_scopes;
         }
 
         wsdd__ProbeMatchesType res;
@@ -105,14 +109,14 @@ public:
         if (Probe(&req, nullptr) != 0)
             throw SoapException(this);
 
-        std::vector<std::string> rv;
+        ProbeMatches_t rv;
         for (int i = 0, I = res.ProbeMatch.size(); i < I; ++i) {
             if (res.ProbeMatch[i] == nullptr)
                 continue;
-            if (res.ProbeMatch[i]->wsdd__XAddrs == nullptr)
+            if (res.ProbeMatch[i]->XAddrs == nullptr)
                 continue;
 
-            rv.push_back(*res.ProbeMatch[i]->wsdd__XAddrs);
+            rv.push_back(*res.ProbeMatch[i]->XAddrs);
         }
 
         return rv;
@@ -355,9 +359,9 @@ private:
 
 
 template<>
-std::unique_ptr<DiscoveryLookup> proxy()
+RemoteDiscovery * proxy()
 {
-    return std::unique_ptr<DiscoveryLookup>(new DiscoveryLookupProxy);
+    return new RemoteDiscoveryProxy;
 }
 
 } // namespace onvifxx

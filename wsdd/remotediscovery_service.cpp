@@ -1,74 +1,103 @@
-#include <onvifxx/discoverylookup.hpp>
-#include <WsddDiscoveryLookupBindingService.h>
+#include <onvifxx/remotediscovery.hpp>
+#include <WsddRemoteDiscoveryBindingService.h>
 #include "wsa.hpp"
-
-#include <mutex>
-#include <thread>
 
 namespace onvifxx {
 
-class DiscoveryLookupService :
-        public DiscoveryLookup,
-        public Service<DiscoveryLookupBindingService>::Engine
+const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
+
+class RemoteDiscoveryService :
+        public RemoteDiscovery,
+        public Service<RemoteDiscoveryBindingService>::Engine
 {
     static const uint SEND_TIMEOUT = 1; // second
     static const uint RECV_TIMEOUT = 1; // second
 
     static const uint APP_MAX_DELAY = 100;
 
-    const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
-
-
 public:
-    DiscoveryLookupService() :
+    RemoteDiscoveryService() :
         wsa_(this)
     {
         send_timeout = SEND_TIMEOUT;
         recv_timeout = RECV_TIMEOUT;
     }
 
+    virtual RemoteDiscoveryBindingService * copy()
+    {
+        return new RemoteDiscoveryService();
+    }
+
+    virtual int Hello(wsdd__HelloType * dn__Hello, wsdd__ResolveType * dn__HelloResponse)
+    {
+        if (dn__Hello == nullptr || dn__HelloResponse == nullptr) {
+            wsa_.faultSubcode(1, "sender Hello", "Invalid arg");
+            return SOAP_ERR;
+        }
+
+        return SOAP_OK;
+    }
+
+    virtual int Bye(wsdd__ByeType * dn__Bye, wsdd__ResolveType * dn__ByeResponse)
+    {
+        if (dn__Bye == nullptr || dn__ByeResponse == nullptr) {
+            wsa_.faultSubcode(1, "sender Bye", "Invalid arg");
+            return SOAP_ERR;
+        }
+
+        return SOAP_OK;
+    }
+
+        /// Web service operation 'Probe' (returns error code or SOAP_OK)
+    virtual int Probe(wsdd__ProbeType *dn__Probe, wsdd__ProbeMatchesType *dn__ProbeResponse)
+    {
+        if (dn__Probe == nullptr || dn__ProbeResponse == nullptr) {
+            wsa_.faultSubcode(1, "sender Probe", "Invalid arg");
+            return SOAP_ERR;
+        }
+
+        wsdd__ScopesType wsddScopes;
+        if (dn__Probe->Scopes == nullptr)
+            wsddScopes = *dn__Probe->Scopes;
+        RemoteDiscovery::Scopes_t scopes(wsddScopes.__item, wsddScopes.MatchBy);
+        probes_ = probe(dn__Probe->Types, &scopes);
+
+
+        responce_.resize(probes_.size());
+        dn__ProbeResponse->ProbeMatch.clear();
+        dn__ProbeResponse->ProbeMatch.reserve(responce_.size());
+
+        for (size_t i = 0; i < probes_.size(); ++i) {
+            wsa__EndpointReferenceType endpoint;
+            endpoint.soap_default(this);
+            responce_[i].wsa__EndpointReference = &endpoint;
+            responce_[i].Types = dn__Probe->Types;
+            responce_[i].Scopes = dn__Probe->Scopes;
+            responce_[i].XAddrs = &probes_[i];
+            responce_[i].MetadataVersion = 0;
+
+            dn__ProbeResponse->ProbeMatch.push_back(&responce_[i]);
+        }
+
+        return SOAP_OK;
+    }
+
     virtual std::vector<std::string> probe(std::string * types, Scopes_t * scopes)
     {
-        std::vector<std::string> rv = {};
+        std::vector<std::string> rv;
         if (scopes != nullptr)
             rv.push_back("127.0.0.1");
         if (types != nullptr && *types == "dn::NetworkTransmitter");
             rv.push_back("localhost");
     }
 
-    virtual	DiscoveryLookupBindingService * copy()
+    virtual void hello()
     {
-        return new DiscoveryLookupService();
     }
 
-    virtual	int Probe(wsdd__ProbeType * wsdd__Probe, wsdd__ProbeMatchesType * wsdd__ProbeResponse)
+    virtual void bye()
     {
-        if (wsdd__Probe == nullptr || wsdd__ProbeResponse == nullptr) {
-            wsa_.faultSubcode(1, "sender Probe", "Invalid arg");
-            return SOAP_ERR;
-        }
-
-        auto wsddScopes = wsdd__Probe->wsdd__Scopes == nullptr ? wsdd__ScopesType() : *wsdd__Probe->wsdd__Scopes;
-        auto scopes = DiscoveryLookup::Scopes_t(wsddScopes.__item, wsddScopes.MatchBy);
-        probes_ = probe(wsdd__Probe->wsdd__Types, &scopes);
-
-
-        responce_.resize(probes_.size());
-        wsdd__ProbeResponse->ProbeMatch.clear();
-        wsdd__ProbeResponse->ProbeMatch.reserve(responce_.size());
-
-        for (auto i = 0; i < probes_.size(); ++i) {
-            wsa__EndpointReferenceType endpoint;
-            endpoint.soap_default(this);
-            responce_[i].wsa__EndpointReference = &endpoint;
-            responce_[i].wsdd__Types = wsdd__Probe->wsdd__Types;
-            responce_[i].wsdd__Scopes = wsdd__Probe->wsdd__Scopes;
-            responce_[i].wsdd__XAddrs = &probes_[i];
-            responce_[i].wsdd__MetadataVersion = 0;
-
-            wsdd__ProbeResponse->ProbeMatch.push_back(&responce_[i]);
-        }
-   }
+    }
 
 
 private:
@@ -310,9 +339,9 @@ private:
 
 
 template<>
-std::unique_ptr<DiscoveryLookup> service()
+RemoteDiscovery * service()
 {
-    return std::unique_ptr<DiscoveryLookup>(new DiscoveryLookupService);
+    return new RemoteDiscoveryService;
 }
 
 

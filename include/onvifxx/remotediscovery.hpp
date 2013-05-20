@@ -6,22 +6,20 @@
 namespace onvifxx {
 
 
-struct DiscoveryLookup
-{
-    typedef std::pair<std::string, std::string *> Scopes_t;
-    virtual std::vector<std::string> probe(std::string * types, Scopes_t * scopes) = 0;
-};
-
 struct RemoteDiscovery
 {
+    typedef std::pair<std::string, std::string *> Scopes_t;
+    typedef std::vector<std::string> ProbeMatches_t;
+
     virtual void hello() = 0;
     virtual void bye() = 0;
+    virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes) = 0;
 };
 
 template<>
-std::unique_ptr<DiscoveryLookup> proxy();
+RemoteDiscovery * proxy();
 template<>
-std::unique_ptr<DiscoveryLookup> service();
+RemoteDiscovery * service();
 
 
 } // namespace onvifxx
