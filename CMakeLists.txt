@@ -1,6 +1,8 @@
 project(onvifxx)
 cmake_minimum_required(VERSION 2.6)
 
+# INITIALIZE
+
 if(ENABLE_DEBUG)
 	set(CMAKE_BUILD_TYPE Debug)
 endif()
@@ -12,6 +14,8 @@ endif(NOT CMAKE_COMPILER_IS_GNUCXX)
 OPTION(WITH_TESTS "Build tests." ON)
 OPTION(ONLY_SERVER "Build server." OFF)
 OPTION(ONLY_CLIENT "Build client." OFF)
+
+# PREPARE
 
 if(ONLY_SERVER AND ONLY_CLIENT)
 	message(FATAL_ERROR "Set just one option ONLY_SERVER or ONLY_CLIENT!")
@@ -33,6 +37,8 @@ find_package(GSOAP 2.8.15 REQUIRED)
 message(STATUS "The GSOAP version: ${GSOAP_VERSION}")
 message(STATUS "The GSOAP include directory: ${GSOAP_INCLUDE_DIR}")
 message(STATUS "The GSOAP libraries: ${GSOAP_LIBRARIES}")
+
+# BUILD
 
 if(ONLY_SERVER)
 	file(GLOB SOURCES src/*_service.cpp)
@@ -68,8 +74,19 @@ target_link_libraries(${PROJECT_NAME}
 #	${PROJECT_NAME}_sock
 	${PROJECT_NAME}_onvif
 #	${PROJECT_NAME}_wsdd
-	${Boost_LIBRARIES} ${GSOAP_LIBRARIES})
+	${Boost_LIBRARIES} ${GSOAP_LIBRARIES}
+)
 
 if(WITH_TESTS)
 	 add_subdirectory(tests)
 endif(WITH_TESTS)
+
+
+# INSTALL
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/onvifxx
+	DESTINATION include
+)
+install(TARGETS ${PROJECT_NAME}
+		LIBRARY DESTINATION lib
+)
+

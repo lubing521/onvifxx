@@ -72,3 +72,7 @@ add_library(${PROJECT_NAME} SHARED
 	typemap.dat
 	${Boost_LIBRARIES} ${GSOAP_LIBRARIES}
 )
+
+install(TARGETS ${PROJECT_NAME}
+	LIBRARY DESTINATION lib
+)
