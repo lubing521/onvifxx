@@ -7,7 +7,7 @@ namespace onvifxx {
 const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
 
 class RemoteDiscoveryProxy :
-        public RemoteDiscovery,
+        public Proxy<RemoteDiscovery>,
         private RemoteDiscoveryBindingProxy
 {
     static const uint SEND_TIMEOUT = 1; // second
@@ -357,9 +357,7 @@ private:
 //    return rv;
 //}
 
-
-template<>
-RemoteDiscovery * proxy()
+Proxy<RemoteDiscovery> * RemoteDiscovery::createProxy()
 {
     return new RemoteDiscoveryProxy;
 }

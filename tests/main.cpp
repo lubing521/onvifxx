@@ -30,23 +30,38 @@ typedef asio::ip::udp AsioUdp_t;
 
 //};
 
-struct RemoteDiscovery : onvifxx::RemoteDiscovery
+struct RemoteDiscoveryService : onvifxx::RemoteDiscovery
 {
-	typedef onvifxx::Service<RemoteDiscovery> Service_t;
+    virtual void hello()
+    {
+
+    }
+
+    virtual void bye()
+    {
+
+    }
+
+    virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes)
+    {
+        return ProbeMatches_t();
+    }
 };
 
 int main(int argc, char ** argv)
 {
     try {
-	
-        RemoteDiscovery::Service_t service;
-        service.run();
+        RemoteDiscoveryService obj;
+        onvifxx::Service<onvifxx::RemoteDiscovery> * service = onvifxx::RemoteDiscovery::createService();
+        service->bind(&obj);
+        BOOST_ASSERT(service->accept() != -1);
+        BOOST_ASSERT(!service->serve() != -1);
 
         std::string types = "dn:NetworkVideoTransmitter";
-        onvifxx::RemoteDiscovery * proxy = onvifxx::proxy<onvifxx::RemoteDiscovery>();
-	onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
-	std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
-	delete proxy;
+        onvifxx::Proxy<onvifxx::RemoteDiscovery> * proxy = onvifxx::RemoteDiscovery::createProxy();
+        onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
+        std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
+        delete proxy;
 
     } catch (const onvifxx::UnixException & ex) {
         std::cerr << "Error (" << ex.code() << ") " << ex.what() << "!" << std::endl;

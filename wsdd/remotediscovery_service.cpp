@@ -6,9 +6,36 @@ namespace onvifxx {
 
 const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
 
+template<class T, class I>
+struct ServiceImpl : Service<T>, I
+{
+    T * p;
+
+    ServiceImpl()
+    {
+        p = nullptr;
+    }
+
+    virtual	int serve()
+    {
+        return I::serve();
+    }
+
+    virtual	int accept()
+    {
+        return I::accept();
+    }
+
+    virtual void bind(T * obj)
+    {
+        p = obj;
+    }
+
+};
+
+
 class RemoteDiscoveryService :
-        public RemoteDiscovery,
-        public Service<RemoteDiscoveryBindingService>::Engine
+    public ServiceImpl<RemoteDiscovery, RemoteDiscoveryBindingService>
 {
     static const uint SEND_TIMEOUT = 1; // second
     static const uint RECV_TIMEOUT = 1; // second
@@ -48,20 +75,20 @@ public:
         return SOAP_OK;
     }
 
-        /// Web service operation 'Probe' (returns error code or SOAP_OK)
-    virtual int Probe(wsdd__ProbeType *dn__Probe, wsdd__ProbeMatchesType *dn__ProbeResponse)
+    virtual int Probe(wsdd__ProbeType * dn__Probe, wsdd__ProbeMatchesType * dn__ProbeResponse)
     {
         if (dn__Probe == nullptr || dn__ProbeResponse == nullptr) {
             wsa_.faultSubcode(1, "sender Probe", "Invalid arg");
             return SOAP_ERR;
         }
 
-        wsdd__ScopesType wsddScopes;
-        if (dn__Probe->Scopes == nullptr)
-            wsddScopes = *dn__Probe->Scopes;
-        RemoteDiscovery::Scopes_t scopes(wsddScopes.__item, wsddScopes.MatchBy);
-        probes_ = probe(dn__Probe->Types, &scopes);
-
+        if (p != nullptr) {
+            wsdd__ScopesType wsddScopes;
+            if (dn__Probe->Scopes == nullptr)
+                wsddScopes = *dn__Probe->Scopes;
+            RemoteDiscovery::Scopes_t scopes(wsddScopes.__item, wsddScopes.MatchBy);
+            probes_ = p->probe(dn__Probe->Types, &scopes);
+        }
 
         responce_.resize(probes_.size());
         dn__ProbeResponse->ProbeMatch.clear();
@@ -81,24 +108,6 @@ public:
 
         return SOAP_OK;
     }
-
-    virtual std::vector<std::string> probe(std::string * types, Scopes_t * scopes)
-    {
-        std::vector<std::string> rv;
-        if (scopes != nullptr)
-            rv.push_back("127.0.0.1");
-        if (types != nullptr && *types == "dn::NetworkTransmitter");
-            rv.push_back("localhost");
-    }
-
-    virtual void hello()
-    {
-    }
-
-    virtual void bye()
-    {
-    }
-
 
 private:
     Wsa wsa_;
@@ -337,12 +346,11 @@ private:
 //    return rv;
 //}
 
-
-template<>
-RemoteDiscovery * service()
+Service<RemoteDiscovery> * RemoteDiscovery::createService()
 {
-    return new RemoteDiscoveryService;
+    return new RemoteDiscoveryService();
 }
+
 
 
 

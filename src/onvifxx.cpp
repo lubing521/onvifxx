@@ -62,17 +62,5 @@ int UnixException::code() const
     return code_;
 }
 
-void ServiceBase::run(Engine * engine)
-{
-    for (;;)
-    {
-        if (!soap_valid_socket(engine->accept()))
-            break;
-
-        if (!soap_valid_socket(engine->serve()))
-            break;
-    }
-}
-
 
 } // namespace onvifxx

@@ -14,12 +14,10 @@ struct RemoteDiscovery
     virtual void hello() = 0;
     virtual void bye() = 0;
     virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes) = 0;
-};
 
-template<>
-RemoteDiscovery * proxy();
-template<>
-RemoteDiscovery * service();
+    static Proxy<RemoteDiscovery> * createProxy();
+    static Service<RemoteDiscovery> * createService();
+};
 
 
 } // namespace onvifxx

@@ -71,48 +71,19 @@ private:
 
 
 template<class T>
-T * proxy();
-
-template<class T>
-T * service();
-
-class ServiceBase
+struct Proxy : T
 {
-protected:
-    struct Engine
-    {
-        virtual	int serve() = 0;
-        virtual	int accept() = 0;
-
-        virtual	void print() = 0;
-    };
-
-    virtual void run(Engine * engine);
 };
 
 template<class T>
-class Service :
-        private ServiceBase
+class Service
 {
-
 public:
-    struct Engine : T, ServiceBase::Engine
-    {
-        virtual	int serve() { return T::serve(); }
-        virtual	int accept() { return T::accept(); }
+    virtual	int serve() = 0;
+    virtual	int accept() = 0;
 
-        virtual	void print()
-        {
-            std::cerr << "!!!!!!!!!!!!!!!!!" << std::endl;
-        }
-    };
-
-    virtual void run(Engine * engine = nullptr)
-    {
-        ServiceBase::run(dynamic_cast<ServiceBase::Engine *>(this));
-    }
+    virtual void bind(T * obj) = 0;
 };
-
 
 //template<class T>
 //class Pimpl
