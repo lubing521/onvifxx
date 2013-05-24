@@ -70,7 +70,7 @@ add_library(${PROJECT_NAME} SHARED
 	${WSDD_HEADERS} ${WSDD_SOURCES}
 	${WSDD_SOURCE_DIR}/Wsdd.nsmap
 	typemap.dat
-	${Boost_LIBRARIES} ${GSOAP_LIBRARIES}
+	${Boost_system_LIBRARIES} ${GSOAP_LIBRARIES}
 )
 
 install(TARGETS ${PROJECT_NAME}

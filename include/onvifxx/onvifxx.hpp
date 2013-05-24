@@ -70,11 +70,18 @@ private:
 template<class T>
 struct Proxy : T
 {
+    virtual ~Proxy()
+    {
+    }
 };
 
 template<class T>
 struct Service
 {
+    virtual ~Service()
+    {
+    }
+
     virtual int bind(T * obj, int port = 0) = 0;
     virtual	int accept() = 0;
     virtual	int serve() = 0;
