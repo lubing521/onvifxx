@@ -6,39 +6,11 @@ namespace onvifxx {
 
 const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
 
-template<class T, class I>
-struct ServiceImpl : Service<T>, I
-{
-    T * p;
-
-    ServiceImpl()
-    {
-        p = nullptr;
-    }
-
-    virtual	int serve()
-    {
-        return I::serve();
-    }
-
-    virtual	int accept()
-    {
-        return I::accept();
-    }
-
-    virtual void bind(T * obj)
-    {
-        p = obj;
-    }
-
-};
-
-
 class RemoteDiscoveryService :
-    public ServiceImpl<RemoteDiscovery, RemoteDiscoveryBindingService>
+    public BaseService<RemoteDiscovery, RemoteDiscoveryBindingService>
 {
-    static const uint SEND_TIMEOUT = 1; // second
-    static const uint RECV_TIMEOUT = 1; // second
+    static const uint SEND_TIMEOUT = 10; // second
+    static const uint RECV_TIMEOUT = 10; // second
 
     static const uint APP_MAX_DELAY = 100;
 
@@ -48,6 +20,32 @@ public:
     {
         send_timeout = SEND_TIMEOUT;
         recv_timeout = RECV_TIMEOUT;
+    }
+
+    virtual int bind(RemoteDiscovery * obj, int port)
+    {
+        p = obj;
+        if (port == 0)
+            port = 3702;
+
+        soap_mode(this, SOAP_IO_UDP);
+
+        int socket = RemoteDiscoveryBindingService::bind(nullptr, port, 100);
+        if (!soap_valid_socket(socket))
+            return SOAP_INVALID_SOCKET;
+
+        ip_mreq mcast;
+        mcast.imr_multiaddr.s_addr = inet_addr(WSDD_MULTICAT_IP);
+        mcast.imr_interface.s_addr = htonl(INADDR_ANY);
+        if (setsockopt(socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mcast, sizeof(mcast)) < 0)
+            return SOAP_INVALID_SOCKET;
+
+        return socket;
+    }
+
+    virtual operator soap *()
+    {
+        return this;
     }
 
     virtual RemoteDiscoveryBindingService * copy()
@@ -346,13 +344,10 @@ private:
 //    return rv;
 //}
 
-Service<RemoteDiscovery> * RemoteDiscovery::createService()
+Service<RemoteDiscovery> * RemoteDiscovery::service()
 {
     return new RemoteDiscoveryService();
 }
-
-
-
 
 } // namespace onvifxx
 

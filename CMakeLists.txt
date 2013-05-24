@@ -2,6 +2,7 @@ project(onvifxx)
 cmake_minimum_required(VERSION 2.6)
 
 # INITIALIZE
+#-DENABLE_DEBUG=TRUE -DGSOAP_ROOT=/usr/local -DBOOST_ROOT=/usr/local
 
 if(ENABLE_DEBUG)
 	set(CMAKE_BUILD_TYPE Debug)

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include <boost/scoped_ptr.hpp>
 
 
 namespace asio = boost::asio;
@@ -34,34 +35,50 @@ struct RemoteDiscoveryService : onvifxx::RemoteDiscovery
 {
     virtual void hello()
     {
-
+        std::cerr << "hello" << std::endl;
     }
 
     virtual void bye()
     {
-
+        std::cerr << "bye" << std::endl;
     }
 
     virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes)
     {
+        std::cerr << "probe" << std::endl;
         return ProbeMatches_t();
     }
 };
+
+typedef onvifxx::Proxy<onvifxx::RemoteDiscovery> Proxy_t;
+typedef onvifxx::Service<onvifxx::RemoteDiscovery> Service_t;
+
 
 int main(int argc, char ** argv)
 {
     try {
         RemoteDiscoveryService obj;
-        onvifxx::Service<onvifxx::RemoteDiscovery> * service = onvifxx::RemoteDiscovery::createService();
-        service->bind(&obj);
-        BOOST_ASSERT(service->accept() != -1);
-        BOOST_ASSERT(!service->serve() != -1);
+        boost::scoped_ptr<Service_t> service(onvifxx::RemoteDiscovery::service());
+        BOOST_ASSERT(service->bind(&obj) != -1);
+        for (int i = 0; i < 100000; ++i) {
+            std::cerr << i << std::endl;
+
+            int socket = service->accept();
+            BOOST_ASSERT(socket != -1);
+
+            int error = service->serve();
+            if (error == -1)
+                continue;
+            if (error != 0)
+                throw onvifxx::SoapException(*service);
+
+            service->destroy();
+        }
 
         std::string types = "dn:NetworkVideoTransmitter";
-        onvifxx::Proxy<onvifxx::RemoteDiscovery> * proxy = onvifxx::RemoteDiscovery::createProxy();
+        boost::scoped_ptr<Proxy_t>  proxy(onvifxx::RemoteDiscovery::proxy());
         onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
         std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
-        delete proxy;
 
     } catch (const onvifxx::UnixException & ex) {
         std::cerr << "Error (" << ex.code() << ") " << ex.what() << "!" << std::endl;

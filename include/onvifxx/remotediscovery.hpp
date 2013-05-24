@@ -5,6 +5,8 @@
 
 namespace onvifxx {
 
+static const char WSDD_MULTICAT_IP[] = "239.255.255.250";
+static const int WSDD_MULTICAT_PORT = 3702;
 
 struct RemoteDiscovery
 {
@@ -15,8 +17,8 @@ struct RemoteDiscovery
     virtual void bye() = 0;
     virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes) = 0;
 
-    static Proxy<RemoteDiscovery> * createProxy();
-    static Service<RemoteDiscovery> * createService();
+    static Proxy<RemoteDiscovery> * proxy();
+    static Service<RemoteDiscovery> * service();
 };
 
 

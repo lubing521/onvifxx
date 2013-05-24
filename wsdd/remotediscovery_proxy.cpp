@@ -2,6 +2,8 @@
 #include <WsddRemoteDiscoveryBindingProxy.h>
 #include "wsa.hpp"
 
+#include <sstream>
+
 namespace onvifxx {
 
 const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
@@ -17,7 +19,7 @@ class RemoteDiscoveryProxy :
 
 public:
     RemoteDiscoveryProxy() :
-        RemoteDiscoveryBindingProxy(WSDD_URL.c_str(), SOAP_IO_UDP),
+        RemoteDiscoveryBindingProxy(url().c_str(), SOAP_IO_UDP),
         wsa_(this)
     {
         send_timeout = SEND_TIMEOUT;
@@ -120,6 +122,14 @@ public:
         }
 
         return rv;
+    }
+
+private:
+    static std::string url()
+    {
+        std::stringstream ss;
+        ss << "soap.udp://" << WSDD_MULTICAT_IP << ":" << WSDD_MULTICAT_PORT;
+        return ss.str();
     }
 
 private:
@@ -357,7 +367,7 @@ private:
 //    return rv;
 //}
 
-Proxy<RemoteDiscovery> * RemoteDiscovery::createProxy()
+Proxy<RemoteDiscovery> * RemoteDiscovery::proxy()
 {
     return new RemoteDiscoveryProxy;
 }

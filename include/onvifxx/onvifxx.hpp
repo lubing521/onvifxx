@@ -28,9 +28,6 @@ struct soap;
 
 namespace onvifxx {
 
-
-static const std::string WSDD_URL = "soap.udp://239.255.255.250:3702";
-
 class Exception : public std::exception
 {
 public:
@@ -76,13 +73,47 @@ struct Proxy : T
 };
 
 template<class T>
-class Service
+struct Service
 {
-public:
-    virtual	int serve() = 0;
+    virtual int bind(T * obj, int port = 0) = 0;
     virtual	int accept() = 0;
+    virtual	int serve() = 0;
+    virtual	void destroy() = 0;
+    virtual operator soap *() = 0;
+};
 
-    virtual void bind(T * obj) = 0;
+template<class T, class I>
+struct BaseService : Service<T>, I
+{
+    T * p;
+
+    BaseService()
+    {
+        p = nullptr;
+    }
+
+    virtual int bind(T * obj, int port)
+    {
+        p = obj;
+        if (port == 0)
+            port = 80;
+        return I::bind(nullptr, port, 100);
+    }
+
+    virtual	int serve()
+    {
+        return I::serve();
+    }
+
+    virtual	int accept()
+    {
+        return I::accept();
+    }
+
+    virtual	void destroy()
+    {
+        I::destroy();
+    }
 };
 
 //template<class T>
