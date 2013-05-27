@@ -35,7 +35,7 @@ if(NOT IS_DIRECTORY ${WSDD_SOURCE_DIR})
 			"wsa__EndpointReferenceType *wsa__FaultTo;\n"
 			"std::string  wsa__To;\n"
 			"std::string  wsa__Action;\n"
-			"wsdd__AppSequenceType *wsdd__AppSequence;\n"
+			"wsd__AppSequenceType *wsd__AppSequence;\n"
 		"};"
 	)
 
@@ -67,9 +67,8 @@ endif(ONLY_SERVER)
 add_definitions(-DWITH_PURE_VIRTUAL)
 
 add_library(${PROJECT_NAME} SHARED
-	${WSDD_HEADERS} ${WSDD_SOURCES}
-	${WSDD_SOURCE_DIR}/Wsdd.nsmap
 	typemap.dat
+	${WSDD_HEADERS} ${WSDD_SOURCES}
 	${Boost_system_LIBRARIES} ${GSOAP_LIBRARIES}
 )
 

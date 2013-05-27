@@ -26,10 +26,10 @@ if(NOT IS_DIRECTORY ${ONVIF_SOURCE_DIR})
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
 
-        execute_process(
-                COMMAND ln -s ${GSOAP_IMPORT_DIR}/soap12.h soap12.h
-                WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        )
+		execute_process(
+				COMMAND ln -s ${GSOAP_IMPORT_DIR}/soap12.h soap12.h
+				WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+		)
 
 	execute_process(
 		COMMAND ${GSOAP_SOAPCPP2} -abinxL -f100 -dsrc -pOnvif h
@@ -58,7 +58,6 @@ endif(ONLY_SERVER)
 add_definitions(-DWITH_PURE_VIRTUAL)
 
 add_library(${PROJECT_NAME} STATIC
-	${ONVIF_HEADERS} ${ONVIF_SOURCES}
-	${ONVIF_SOURCE_DIR}/Onvif.nsmap
 	typemap.dat
+	${ONVIF_HEADERS} ${ONVIF_SOURCES}
 )

@@ -1,5 +1,5 @@
 #include <onvifxx/onvifxx.hpp>
-#include <Onvif.nsmap>
+#include <OnvifH.h>
 
 struct Namespace namespaces[] = {};
 

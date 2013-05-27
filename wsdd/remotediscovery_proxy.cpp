@@ -1,5 +1,6 @@
 #include <onvifxx/remotediscovery.hpp>
 #include <WsddRemoteDiscoveryBindingProxy.h>
+#include <Wsdd.nsmap>
 #include "wsa.hpp"
 
 #include <sstream>
@@ -67,8 +68,8 @@ public:
                 throw SoapException(this);
         }
 
-        if (soap_header()->wsdd__AppSequence != nullptr) {
-            wsdd__AppSequenceType * seq = soap_header()->wsdd__AppSequence;
+        if (soap_header()->wsd__AppSequence != nullptr) {
+            wsd__AppSequenceType * seq = soap_header()->wsd__AppSequence;
             instanceId() = seq->InstanceId;
             messageNumber() = seq->MessageNumber;
             if (seq->SequenceId != nullptr)
@@ -90,15 +91,15 @@ public:
 
         // SOAP Header
         const std::string & dst = TO_TS_URL;
-        wsa_.request(messageId, dst, "");
+        wsa_.request(messageId, dst, SOAP_NAMESPACE_OF_wsd"/Probe");
         wsa_.addReplyTo("");
 
         /* Probe */
-        wsdd__ProbeType req;
+        wsd__ProbeType req;
         req.soap_default(this);
         req.Types = types;
 
-        wsdd__ScopesType req_scopes;
+        wsd__ScopesType req_scopes;
         req_scopes.soap_default(this);
         if (scopes != nullptr) {
             req_scopes.__item = scopes->first;
@@ -106,7 +107,7 @@ public:
             req.Scopes = &req_scopes;
         }
 
-        wsdd__ProbeMatchesType res;
+        wsd__ProbeMatchesType res;
         res.soap_default(this);
         if (Probe(&req, nullptr) != 0)
             throw SoapException(this);
@@ -153,14 +154,14 @@ private:
 //    impl_->resetAppSequence();
 
 //    // Hello
-//    wsdd__HelloType req;
-//    soap_default_wsdd__HelloType(impl_, &req);
+//    wsd__HelloType req;
+//    soap_default_wsd__HelloType(impl_, &req);
 //    req.wsa__EndpointReference.Address = const_cast<char *>(arg.endpoint.c_str());
 //    req.Types = const_cast<char *>(arg.type.c_str());
 
-//    wsdd__ScopesType req_scopes;
+//    wsd__ScopesType req_scopes;
 //    if (!scopes.empty()) {
-//        soap_default_wsdd__ScopesType(impl_, &req_scopes);
+//        soap_default_wsd__ScopesType(impl_, &req_scopes);
 //        req_scopes.__item = const_cast<char *>(scopes.c_str());
 //        req_scopes.MatchBy = const_cast<char *>(matchBy.c_str());
 //        req.Scopes = &req_scopes;
@@ -191,8 +192,8 @@ private:
 //#endif
 
 //    // Bye
-//    wsdd__ByeType req;
-//    soap_default_wsdd__ByeType(impl_, &req);
+//    wsd__ByeType req;
+//    soap_default_wsd__ByeType(impl_, &req);
 //#ifdef SOAP_WSA_2005
 //    req.wsa5__EndpointReference.Address = const_cast<char *>(endpointRef.c_str());
 //#else
@@ -200,9 +201,9 @@ private:
 //#endif
 //    req.Types = const_cast<char *>(types.c_str());
 
-//    wsdd__ScopesType req_scopes;
+//    wsd__ScopesType req_scopes;
 //    if (!scopes.empty()) {
-//        soap_default_wsdd__ScopesType(impl_, &req_scopes);
+//        soap_default_wsd__ScopesType(impl_, &req_scopes);
 //        req_scopes.__item = const_cast<char *>(scopes.c_str());
 //        req_scopes.MatchBy = const_cast<char *>(matchBy.c_str());
 //        req.Scopes = &req_scopes;
@@ -228,8 +229,8 @@ private:
 //    impl_->resetAppSequence();
 
 //    /* Probe */
-//    wsdd__ResolveType req;
-//    soap_default_wsdd__ResolveType(impl_, &req);
+//    wsd__ResolveType req;
+//    soap_default_wsd__ResolveType(impl_, &req);
 //#ifdef SOAP_WSA_2005
 //    req.wsa5__EndpointReference.Address = const_cast<char *>(endpointRef.c_str());
 //#else
@@ -277,8 +278,8 @@ private:
 //    impl_->setAppSequence();
 
 //    // ResolveMatches
-//    wsdd__ResolveMatchType match;
-//    soap_default_wsdd__ResolveMatchType(impl_, &match);
+//    wsd__ResolveMatchType match;
+//    soap_default_wsd__ResolveMatchType(impl_, &match);
 //#ifdef SOAP_WSA_2005
 //    match.wsa5__EndpointReference.Address = const_cast<char *>(endpointRef.c_str());
 //#else
@@ -286,9 +287,9 @@ private:
 //#endif
 //    match.Types = const_cast<char *>(types.c_str());
 
-//    wsdd__ScopesType match_scopes;
+//    wsd__ScopesType match_scopes;
 //    if (!scopes.empty()) {
-//      soap_default_wsdd__ScopesType(impl_, &match_scopes);
+//      soap_default_wsd__ScopesType(impl_, &match_scopes);
 //      match_scopes.__item = const_cast<char *>(scopes.c_str());
 //      match_scopes.MatchBy = const_cast<char *>(matchBy.c_str());
 //      match.Scopes = &match_scopes;
@@ -297,8 +298,8 @@ private:
 //    match.MetadataVersion = metadataVersion;
 
 
-//    wsdd__ResolveMatchesType res;
-//    soap_default_wsdd__ResolveMatchesType(impl_, &res);
+//    wsd__ResolveMatchesType res;
+//    soap_default_wsd__ResolveMatchesType(impl_, &res);
 //    res.ResolveMatch = &match;
 //    if (impl_->send_ResolveMatches(endpoint.c_str(), ACTION.c_str(), &res) != 0)
 //        throw SoapException(impl_);
@@ -312,22 +313,22 @@ private:
 //    Discovery::ProbeMatch::List_t rv;
 
 //    // managed mode: receive the matches
-//    struct __wsdd__ProbeMatches res;
-//    wsdd__ProbeMatchesType probe_matches;
-//    soap_default_wsdd__ProbeMatchesType(impl_, &probe_matches);
-//    res.wsdd__ProbeMatches = &probe_matches;
+//    struct __wsd__ProbeMatches res;
+//    wsd__ProbeMatchesType probe_matches;
+//    soap_default_wsd__ProbeMatchesType(impl_, &probe_matches);
+//    res.wsd__ProbeMatches = &probe_matches;
 
 //    if (impl_->recv_ProbeMatches(res) != 0)
 //        throw SoapException(impl_);
 
 //    impl_->checkHeader("ProbeMatches wrong header");
-//    if (res.wsdd__ProbeMatches == nullptr) {
+//    if (res.wsd__ProbeMatches == nullptr) {
 //        if (soap_wsa_sender_fault(impl_, "WSDD ProbeMatches incomplete", nullptr) == 0)
 //            throw SoapException(impl_);
 //    }
 
-//    for (int i = 0; i < res.wsdd__ProbeMatches->__sizeProbeMatch; ++i) {
-//        auto & probe_match = res.wsdd__ProbeMatches->ProbeMatch[i];
+//    for (int i = 0; i < res.wsd__ProbeMatches->__sizeProbeMatch; ++i) {
+//        auto & probe_match = res.wsd__ProbeMatches->ProbeMatch[i];
 //        rv.push_back(ProbeMatch());
 
 //        rv.back().endpoint.first    = Impl::toString(probe_match.wsa__EndpointReference.Address);
@@ -346,17 +347,17 @@ private:
 //    ResolveMatch rv;
 
 //    // managed mode: receive the matches
-//    struct __wsdd__ResolveMatches res;
-//    soap_default_wsdd__ResolveMatchesType(impl_, res.wsdd__ResolveMatches);
+//    struct __wsd__ResolveMatches res;
+//    soap_default_wsd__ResolveMatchesType(impl_, res.wsd__ResolveMatches);
 //    if (impl_->recv_ResolveMatches(res) != 0)
 //        throw SoapException(impl_);
 
 //    impl_->checkHeader("WSDD ResolveMatches header incomplete");
-//    if (res.wsdd__ResolveMatches == nullptr || res.wsdd__ResolveMatches->ResolveMatch == nullptr)
+//    if (res.wsd__ResolveMatches == nullptr || res.wsd__ResolveMatches->ResolveMatch == nullptr)
 //        if (soap_wsa_sender_fault(impl_, "WSDD ResolveMatches incomplete", nullptr) == 0)
 //            throw SoapException(impl_);
 
-//    auto resolve_match = res.wsdd__ResolveMatches->ResolveMatch;
+//    auto resolve_match = res.wsd__ResolveMatches->ResolveMatch;
 //    rv.endpoint.first = resolve_match->wsa__EndpointReference.Address;
 //    rv.types = resolve_match->Types;
 //    rv.scopes.item = resolve_match->Scopes->__item;

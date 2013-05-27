@@ -2,7 +2,7 @@
 # Copyright (C) 2013 Sigrand LLC <sigrand.com>
 
 wsa = "http://schemas.xmlsoap.org/ws/2004/08/addressing"
-wsdd = "http://schemas.xmlsoap.org/ws/2005/04/discovery"
+wsd = "http://schemas.xmlsoap.org/ws/2005/04/discovery"
 dn = "http://www.onvif.org/ver10/network/wsdl"
 dnrd= "http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
 dndl= "http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"

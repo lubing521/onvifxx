@@ -100,7 +100,9 @@ int main(int argc, char ** argv)
         onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
         std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
 
+        std::cerr << "QWe" << std::endl;
         service_thread.join();
+        std::cerr << "ewQ" << std::endl;
     } catch (const onvifxx::UnixException & ex) {
         std::cerr << "Error (" << ex.code() << ") " << ex.what() << "!" << std::endl;
         return 1;

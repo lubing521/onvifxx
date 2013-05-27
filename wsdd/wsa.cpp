@@ -1,7 +1,7 @@
 #include "wsa.hpp"
-#include <Wsdd.nsmap>
 #include <WsddH.h>
 //#include <wsaapi.h>
+
 
 #if defined(SOAP_WSA_2003)
 /** Anonymous Reply/To endpoint address */
