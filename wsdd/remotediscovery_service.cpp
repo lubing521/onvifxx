@@ -18,17 +18,17 @@ public:
     RemoteDiscoveryService() :
         wsa_(this)
     {
-        send_timeout = SEND_TIMEOUT;
-        recv_timeout = RECV_TIMEOUT;
+        this->send_timeout = SEND_TIMEOUT;
+        this->recv_timeout = RECV_TIMEOUT;
     }
 
     virtual int bind(RemoteDiscovery * obj, int port)
     {
-        p = obj;
+        this->p = obj;
         if (port == 0)
             port = 3702;
 
-        soap_mode(this, SOAP_IO_UDP);
+        soap_mode(this, SOAP_IO_UDP | SOAP_XML_IGNORENS);
 
         int socket = RemoteDiscoveryBindingService::bind(nullptr, port, 100);
         if (!soap_valid_socket(socket))
@@ -50,7 +50,7 @@ public:
 
     virtual RemoteDiscoveryBindingService * copy()
     {
-        return new RemoteDiscoveryService();
+        return new RemoteDiscoveryService;
     }
 
     virtual int Hello(wsd__HelloType * dn__Hello, wsd__ResolveType * dn__HelloResponse)
@@ -346,7 +346,7 @@ private:
 
 Service<RemoteDiscovery> * RemoteDiscovery::service()
 {
-    return new RemoteDiscoveryService();
+    return new RemoteDiscoveryService;
 }
 
 } // namespace onvifxx
