@@ -11,17 +11,16 @@ const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
 class RemoteDiscoveryService :
     public BaseService<RemoteDiscovery, RemoteDiscoveryBindingService>
 {
-    static const uint SEND_TIMEOUT = 1; // second
-    static const uint RECV_TIMEOUT = 1; // second
-
-    static const uint APP_MAX_DELAY = 100;
+    static const uint TIMEOUT = 5; // second
+    static const uint APP_MAX_DELAY = 500;
 
 public:
     RemoteDiscoveryService() :
         wsa_(this)
     {
-        this->send_timeout = SEND_TIMEOUT;
-        this->recv_timeout = RECV_TIMEOUT;
+        this->send_timeout = TIMEOUT;
+        this->recv_timeout = TIMEOUT;
+        this->accept_timeout = TIMEOUT;
 
         endpoint_.soap_default(this);
     }

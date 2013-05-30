@@ -13,10 +13,10 @@ class RemoteDiscoveryProxy :
         public Proxy<RemoteDiscovery>,
         private RemoteDiscoveryBindingProxy
 {
-    static const uint SEND_TIMEOUT = 1; // second
-    static const uint RECV_TIMEOUT = 1; // second
+    static const uint SEND_TIMEOUT = 5; // second
+    static const uint RECV_TIMEOUT = 5; // second
 
-    static const uint APP_MAX_DELAY = 100;
+    static const uint APP_MAX_DELAY = 500;
 
 public:
     RemoteDiscoveryProxy() :
