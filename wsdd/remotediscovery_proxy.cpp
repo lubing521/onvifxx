@@ -64,7 +64,7 @@ public:
     {
         // check WSA
         if (soap_header() == nullptr) {
-            if (wsa_.faultSubcode(1, "checkHeader", faultMessage.c_str(), "") != 0)
+            if (soap_sender_fault(this, "checkHeader", faultMessage.c_str()) != 0)
                 throw SoapException(this);
         }
 
@@ -77,24 +77,65 @@ public:
         }
     }
 
-    virtual void hello()
+    virtual void hello(std::string * types, Scopes_t * scopes)
     {
+        // SOAP Header
+        wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Hello");
+
+        // Hello
+        wsd__HelloType req;
+        req.soap_default(this);
+        req.Types = types;
+
+        wsd__ScopesType req_scopes;
+        req_scopes.soap_default(this);
+        if (scopes != nullptr) {
+            req_scopes.__item = scopes->first;
+            req_scopes.MatchBy = scopes->second;
+            req.Scopes = &req_scopes;
+        }
+
+        wsd__ResolveType res;
+        res.soap_default(this);
+
+        if (Hello(&req, &res) != 0)
+            throw SoapException(this);
     }
 
-    virtual void bye()
-    {
-    }
-
-    virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes)
+    virtual void bye(std::string * types, Scopes_t * scopes)
     {
         const std::string messageId = wsa_.randUuid();
 
         // SOAP Header
-        const std::string & dst = TO_TS_URL;
-        wsa_.request(messageId, dst, SOAP_NAMESPACE_OF_wsd"/Probe");
+        wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Bye");
+
+        // Bye
+        wsd__ByeType req;
+        req.soap_default(this);
+        req.Types = types;
+
+        wsd__ScopesType req_scopes;
+        req_scopes.soap_default(this);
+        if (scopes != nullptr) {
+            req_scopes.__item = scopes->first;
+            req_scopes.MatchBy = scopes->second;
+            req.Scopes = &req_scopes;
+        }
+
+        wsd__ResolveType res;
+        res.soap_default(this);
+
+        if (Bye(&req, &res) != 0)
+            throw SoapException(this);
+    }
+
+    virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes)
+    {
+        // SOAP Header
+        wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Probe");
         wsa_.addReplyTo("");
 
-        /* Probe */
+        // Probe
         wsd__ProbeType req;
         req.soap_default(this);
         req.Types = types;
@@ -109,7 +150,8 @@ public:
 
         wsd__ProbeMatchesType res;
         res.soap_default(this);
-        if (Probe(&req, nullptr) != 0)
+
+        if (Probe(&req, &res) != 0)
             throw SoapException(this);
 
         ProbeMatches_t rv;

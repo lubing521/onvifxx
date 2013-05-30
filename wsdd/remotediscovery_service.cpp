@@ -2,6 +2,8 @@
 #include <WsddRemoteDiscoveryBindingService.h>
 #include "wsa.hpp"
 
+#include <boost/assert.hpp>
+
 namespace onvifxx {
 
 const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
@@ -20,6 +22,13 @@ public:
     {
         this->send_timeout = SEND_TIMEOUT;
         this->recv_timeout = RECV_TIMEOUT;
+
+        endpoint_.soap_default(this);
+    }
+
+    virtual operator soap *()
+    {
+        return this;
     }
 
     virtual int bind(RemoteDiscovery * obj, int port)
@@ -43,9 +52,14 @@ public:
         return socket;
     }
 
-    virtual operator soap *()
+    virtual	int dispatch()
     {
-        return this;
+        try {
+            return RemoteDiscoveryBindingService::dispatch();
+        } catch (std::exception & ex) {
+            RemoteDiscoveryBindingService::soap_senderfault("RemoteDiscovery", ex.what(), nullptr);
+            return SOAP_FAULT;
+        }
     }
 
     virtual RemoteDiscoveryBindingService * copy()
@@ -55,36 +69,45 @@ public:
 
     virtual int Hello(wsd__HelloType * dn__Hello, wsd__ResolveType * dn__HelloResponse)
     {
-        if (dn__Hello == nullptr || dn__HelloResponse == nullptr) {
-            wsa_.faultSubcode(1, "sender Hello", "Invalid arg");
-            return SOAP_ERR;
+        BOOST_ASSERT(dn__Hello != nullptr && dn__HelloResponse != nullptr);
+
+        if (p != nullptr) {
+            wsd__ScopesType wsdScopes;
+            if (dn__Hello->Scopes != nullptr)
+                wsdScopes = *dn__Hello->Scopes;
+            RemoteDiscovery::Scopes_t scopes(wsdScopes.__item, wsdScopes.MatchBy);
+            p->hello(dn__Hello->Types, &scopes);
         }
 
+        dn__HelloResponse->wsa__EndpointReference = &endpoint_;
         return SOAP_OK;
     }
 
     virtual int Bye(wsd__ByeType * dn__Bye, wsd__ResolveType * dn__ByeResponse)
     {
-        if (dn__Bye == nullptr || dn__ByeResponse == nullptr) {
-            wsa_.faultSubcode(1, "sender Bye", "Invalid arg");
-            return SOAP_ERR;
+        BOOST_ASSERT(dn__Bye != nullptr && dn__ByeResponse != nullptr);
+
+        if (p != nullptr) {
+            wsd__ScopesType wsdScopes;
+            if (dn__Bye->Scopes != nullptr)
+                wsdScopes = *dn__Bye->Scopes;
+            RemoteDiscovery::Scopes_t scopes(wsdScopes.__item, wsdScopes.MatchBy);
+            p->bye(dn__Bye->Types, &scopes);
         }
 
+        dn__ByeResponse->wsa__EndpointReference = &endpoint_;
         return SOAP_OK;
     }
 
     virtual int Probe(wsd__ProbeType * dn__Probe, wsd__ProbeMatchesType * dn__ProbeResponse)
     {
-        if (dn__Probe == nullptr || dn__ProbeResponse == nullptr) {
-            wsa_.faultSubcode(1, "sender Probe", "Invalid arg");
-            return SOAP_ERR;
-        }
+        BOOST_ASSERT(dn__Probe != nullptr && dn__ProbeResponse != nullptr);
 
         if (p != nullptr) {
-            wsd__ScopesType wsddScopes;
+            wsd__ScopesType wsdScopes;
             if (dn__Probe->Scopes != nullptr)
-                wsddScopes = *dn__Probe->Scopes;
-            RemoteDiscovery::Scopes_t scopes(wsddScopes.__item, wsddScopes.MatchBy);
+                wsdScopes = *dn__Probe->Scopes;
+            RemoteDiscovery::Scopes_t scopes(wsdScopes.__item, wsdScopes.MatchBy);
             probes_ = p->probe(dn__Probe->Types, &scopes);
         }
 
@@ -93,9 +116,7 @@ public:
         dn__ProbeResponse->ProbeMatch.reserve(responce_.size());
 
         for (size_t i = 0; i < probes_.size(); ++i) {
-            wsa__EndpointReferenceType endpoint;
-            endpoint.soap_default(this);
-            responce_[i].wsa__EndpointReference = &endpoint;
+            responce_[i].wsa__EndpointReference = &endpoint_;
             responce_[i].Types = dn__Probe->Types;
             responce_[i].Scopes = dn__Probe->Scopes;
             responce_[i].XAddrs = &probes_[i];
@@ -109,6 +130,7 @@ public:
 
 private:
     Wsa wsa_;
+    wsa__EndpointReferenceType endpoint_;
     std::vector<std::string> probes_;
     std::vector<wsd__ProbeMatchType> responce_;
 };

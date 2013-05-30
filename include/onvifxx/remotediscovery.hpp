@@ -13,8 +13,8 @@ struct RemoteDiscovery
     typedef std::pair<std::string, std::string *> Scopes_t;
     typedef std::vector<std::string> ProbeMatches_t;
 
-    virtual void hello() = 0;
-    virtual void bye() = 0;
+    virtual void hello(std::string * types, Scopes_t * scopes) = 0;
+    virtual void bye(std::string * types, Scopes_t * scopes) = 0;
     virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes) = 0;
 
     static Proxy<RemoteDiscovery> * proxy();

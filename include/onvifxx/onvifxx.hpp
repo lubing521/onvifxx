@@ -82,11 +82,12 @@ struct Service
     {
     }
 
+    virtual operator soap *() = 0;
+
     virtual int bind(T * obj, int port = 0) = 0;
     virtual	int accept() = 0;
     virtual	int serve() = 0;
     virtual	void destroy() = 0;
-    virtual operator soap *() = 0;
 };
 
 template<class T, class I>

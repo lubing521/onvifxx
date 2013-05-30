@@ -27,10 +27,11 @@ public:
     Wsa(struct soap * soap);
     ~Wsa();
 
-    int allocHeader();
-
     std::string randUuid();
+
+    int allocHeader();
     int check() const;
+
     int addFrom(const std::string & from);
     int addNoReply();
     int addReplyTo(const std::string & replyTo);
@@ -38,15 +39,8 @@ public:
     int addRelatesTo(const std::string & relatesTo);
 
     int reply(const std::string & id, const std::string & action);
-    int request(const std::string & id, const std::string & to, const std::string & action);
+    int request(const std::string & to, const std::string & action);
 
-    int faultSubcode(int flag, const std::string & faultsubcode, const std::string & faultstring,
-                     const std::string & faultdetail = "") const;
-
-    operator soap * () const
-    {
-        return soap_;
-    }
 
 private:
     soap * soap_;
