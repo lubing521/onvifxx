@@ -54,7 +54,9 @@ public:
     virtual	int dispatch()
     {
         try {
-            return RemoteDiscoveryBindingService::dispatch();
+            int rv = RemoteDiscoveryBindingService::dispatch();
+            if (rv == SOAP_NO_METHOD)
+                return SOAP_OK;
         } catch (std::exception & ex) {
             RemoteDiscoveryBindingService::soap_senderfault("RemoteDiscovery", ex.what(), nullptr);
             return SOAP_FAULT;
