@@ -109,6 +109,9 @@ int main(int argc, char ** argv)
         onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
         std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
 
+        proxy->hello(&types, nullptr);
+        proxy->bye(&types, nullptr);
+
         service_thread.join();
 
     } catch (const onvifxx::UnixException & ex) {
