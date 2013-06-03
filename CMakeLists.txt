@@ -13,6 +13,7 @@ if(NOT CMAKE_COMPILER_IS_GNUCXX)
 endif(NOT CMAKE_COMPILER_IS_GNUCXX)
 
 OPTION(WITH_TESTS "Build tests." ON)
+OPTION(WITH_EXAMPLES "Build examples." ON)
 OPTION(ONLY_SERVER "Build server." OFF)
 OPTION(ONLY_CLIENT "Build client." OFF)
 
@@ -82,6 +83,9 @@ if(WITH_TESTS)
 	 add_subdirectory(tests)
 endif(WITH_TESTS)
 
+if(WITH_EXAMPLES)
+	add_subdirectory(examples)
+endif(WITH_EXAMPLES)
 
 # INSTALL
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/onvifxx
