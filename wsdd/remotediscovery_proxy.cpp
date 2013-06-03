@@ -23,8 +23,12 @@ public:
         RemoteDiscoveryBindingProxy(url().c_str(), SOAP_IO_UDP),
         wsa_(this)
     {
-        send_timeout = SEND_TIMEOUT;
-        recv_timeout = RECV_TIMEOUT;
+        this->send_timeout = SEND_TIMEOUT;
+        this->recv_timeout = RECV_TIMEOUT;
+
+        address_.__item = wsa_.randUuid();
+        endpoint_.soap_default(this);
+        endpoint_.Address = &address_;
     }
 
 
@@ -77,7 +81,7 @@ public:
         }
     }
 
-    virtual void hello(std::string * types, Scopes_t * scopes)
+    virtual void hello(std::string * xaddrs, std::string * types, Scopes_t * scopes)
     {
         // SOAP Header
         wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Hello");
@@ -85,7 +89,9 @@ public:
         // Hello
         wsd__HelloType req;
         req.soap_default(this);
+        req.XAddrs = xaddrs;
         req.Types = types;
+        req.wsa__EndpointReference = &endpoint_;
 
         wsd__ScopesType req_scopes;
         req_scopes.soap_default(this);
@@ -102,7 +108,7 @@ public:
             throw SoapException(this);
     }
 
-    virtual void bye(std::string * types, Scopes_t * scopes)
+    virtual void bye(std::string * xaddrs, std::string * types, Scopes_t * scopes)
     {
         const std::string messageId = wsa_.randUuid();
 
@@ -112,7 +118,9 @@ public:
         // Bye
         wsd__ByeType req;
         req.soap_default(this);
+        req.XAddrs = xaddrs;
         req.Types = types;
+        req.wsa__EndpointReference = &endpoint_;
 
         wsd__ScopesType req_scopes;
         req_scopes.soap_default(this);
@@ -177,6 +185,8 @@ private:
 
 private:
     Wsa wsa_;
+    wsa__AttributedURI address_;
+    wsa__EndpointReferenceType endpoint_;
 };
 
 

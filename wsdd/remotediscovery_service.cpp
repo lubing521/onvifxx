@@ -77,7 +77,7 @@ public:
             if (dn__Hello->Scopes != nullptr)
                 wsdScopes = *dn__Hello->Scopes;
             RemoteDiscovery::Scopes_t scopes(wsdScopes.__item, wsdScopes.MatchBy);
-            p->hello(dn__Hello->Types, &scopes);
+            p->hello(dn__Hello->XAddrs, dn__Hello->Types, &scopes);
         }
 
         dn__HelloResponse->wsa__EndpointReference = &endpoint_;
@@ -93,7 +93,7 @@ public:
             if (dn__Bye->Scopes != nullptr)
                 wsdScopes = *dn__Bye->Scopes;
             RemoteDiscovery::Scopes_t scopes(wsdScopes.__item, wsdScopes.MatchBy);
-            p->bye(dn__Bye->Types, &scopes);
+            p->bye(dn__Bye->XAddrs, dn__Bye->Types, &scopes);
         }
 
         dn__ByeResponse->wsa__EndpointReference = &endpoint_;

@@ -39,17 +39,19 @@ struct RemoteDiscoveryService : onvifxx::RemoteDiscovery
 {
     boost::mutex readyMutex;
 
-    virtual void hello(std::string * types, Scopes_t * scopes)
+    virtual void hello(std::string * xaddrs, std::string * types, Scopes_t * scopes)
     {
         std::clog << "hello("
+                  << (xaddrs != nullptr ? *xaddrs : "") << ", "
                   << (types != nullptr ? *types : "") << ", "
                   << (scopes != nullptr ? scopes->first : "")
                   << ")" << std::endl;
     }
 
-    virtual void bye(std::string * types, Scopes_t * scopes)
+    virtual void bye(std::string * xaddrs, std::string * types, Scopes_t * scopes)
     {
         std::clog << "bye("
+                  << (xaddrs != nullptr ? *xaddrs : "") << ", "
                   << (types != nullptr ? *types : "") << ", "
                   << (scopes != nullptr ? scopes->first : "")
                   << ")" << std::endl;
@@ -104,13 +106,14 @@ int main(int argc, char ** argv)
         boost::mutex::scoped_lock lock(service.readyMutex);
         UNUSED(lock);
 
+        std::string xaddrs = "http://127.0.0.1/onvif/services";
         std::string types = "dn:NetworkVideoTransmitter";
         boost::scoped_ptr<Proxy_t>  proxy(onvifxx::RemoteDiscovery::proxy());
-        onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
-        std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
+//        onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
+//        std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
 
-        proxy->hello(&types, nullptr);
-        proxy->bye(&types, nullptr);
+        proxy->hello(&xaddrs, &types, nullptr);
+//        proxy->bye(&types, nullptr);
 
         service_thread.join();
 
