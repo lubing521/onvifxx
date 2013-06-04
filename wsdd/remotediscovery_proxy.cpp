@@ -101,10 +101,7 @@ public:
             req.Scopes = &req_scopes;
         }
 
-        wsd__ResolveType res;
-        res.soap_default(this);
-
-        if (Hello(&req, &res) != 0)
+        if (Hello(&req, nullptr) != 0)
             throw SoapException(this);
     }
 
@@ -130,10 +127,7 @@ public:
             req.Scopes = &req_scopes;
         }
 
-        wsd__ResolveType res;
-        res.soap_default(this);
-
-        if (Bye(&req, &res) != 0)
+        if (Bye(&req, nullptr) != 0)
             throw SoapException(this);
     }
 
