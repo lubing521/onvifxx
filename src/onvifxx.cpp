@@ -1,6 +1,8 @@
 #include <onvifxx/onvifxx.hpp>
 #include <OnvifH.h>
 
+#include <boost/asio/ip/address.hpp>
+
 struct Namespace namespaces[] = {};
 
 namespace onvifxx {
@@ -61,6 +63,5 @@ int UnixException::code() const
 {
     return code_;
 }
-
 
 } // namespace onvifxx

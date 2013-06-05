@@ -14,6 +14,52 @@ class RemoteDiscoveryService :
     static const uint TIMEOUT = 5; // second
     static const uint APP_MAX_DELAY = 500;
 
+    template<class T>
+    class TypeImpl : public T
+    {
+    public:
+        template<class P>
+        TypeImpl(struct soap * soap, const P & arg)
+        {
+            T::types = arg.Types;
+            T::xaddrs = arg.XAddrs;
+
+            T::scopes = nullptr;
+            if (arg.Scopes != nullptr) {
+                T::scopes = &scopes_;
+                T::scopes->item = arg.Scopes->__item;
+                T::scopes->matchBy = arg.Scopes->MatchBy;
+            }
+
+            T::endpoint = nullptr;
+            if (arg.wsa__EndpointReference != nullptr) {
+                T::endpoint = &endpoint_;
+
+                T::endpoint->address = nullptr;
+                if (arg.wsa__EndpointReference->Address != nullptr) {
+                    T::endpoint->address = &arg.wsa__EndpointReference->Address->__item;
+                }
+
+                T::endpoint->portType = nullptr;
+                if (arg.wsa__EndpointReference->PortType != nullptr) {
+                    T::endpoint->address = &arg.wsa__EndpointReference->PortType->__item;
+                }
+
+                T::endpoint->serviceName = nullptr;
+                if (arg.wsa__EndpointReference->ServiceName != nullptr) {
+                    T::endpoint->serviceName = &service_;
+                    T::endpoint->serviceName->item = arg.wsa__EndpointReference->ServiceName->__item;
+                    T::endpoint->serviceName->portName = arg.wsa__EndpointReference->ServiceName->PortName;
+                }
+            }
+        }
+
+    private:
+        RemoteDiscovery::Scopes_t scopes_;
+        RemoteDiscovery::EndpointReference_t endpoint_;
+        RemoteDiscovery::EndpointReference_t::ServiceName service_;
+    };
+
 public:
     RemoteDiscoveryService() :
         wsa_(this)
@@ -21,8 +67,6 @@ public:
         this->send_timeout = TIMEOUT;
         this->recv_timeout = TIMEOUT;
         this->accept_timeout = TIMEOUT;
-
-        endpoint_.soap_default(this);
     }
 
     virtual operator soap *()
@@ -54,13 +98,24 @@ public:
     virtual	int dispatch()
     {
         try {
+            static const std::string PROBE_MATCHES = "http://www.onvif.org/ver10/network/wsdl/ProbeMatches";
+
             int rv = RemoteDiscoveryBindingService::dispatch();
-            if (rv == SOAP_NO_METHOD)
-                return SOAP_OK;
+            if ((rv != SOAP_OK && rv != SOAP_NO_METHOD) ||
+                (action ? action != PROBE_MATCHES : soap_match_tag(this, tag, "d:ProbeMatches") != 0))
+            {
+                error = rv;
+                throw SoapException(this);
+            }
+
+            return serveProbeMatches();
+
         } catch (std::exception & ex) {
             RemoteDiscoveryBindingService::soap_senderfault("RemoteDiscovery", ex.what(), nullptr);
             return SOAP_FAULT;
         }
+
+        return SOAP_OK;
     }
 
     virtual RemoteDiscoveryBindingService * copy()
@@ -73,14 +128,13 @@ public:
         BOOST_ASSERT(dn__Hello != nullptr && dn__HelloResponse != nullptr);
 
         if (p != nullptr) {
-            wsd__ScopesType wsdScopes;
-            if (dn__Hello->Scopes != nullptr)
-                wsdScopes = *dn__Hello->Scopes;
-            RemoteDiscovery::Scopes_t scopes(wsdScopes.__item, wsdScopes.MatchBy);
-            p->hello(dn__Hello->XAddrs, dn__Hello->Types, &scopes);
+            TypeImpl<RemoteDiscovery::Hello_t> arg(this, *dn__Hello);
+            arg.version = dn__Hello->MetadataVersion;
+            p->hello(arg);
         }
 
-        dn__HelloResponse->wsa__EndpointReference = &endpoint_;
+        dn__HelloResponse->soap_default(this);
+
         return SOAP_OK;
     }
 
@@ -89,14 +143,12 @@ public:
         BOOST_ASSERT(dn__Bye != nullptr && dn__ByeResponse != nullptr);
 
         if (p != nullptr) {
-            wsd__ScopesType wsdScopes;
-            if (dn__Bye->Scopes != nullptr)
-                wsdScopes = *dn__Bye->Scopes;
-            RemoteDiscovery::Scopes_t scopes(wsdScopes.__item, wsdScopes.MatchBy);
-            p->bye(dn__Bye->XAddrs, dn__Bye->Types, &scopes);
+            TypeImpl<RemoteDiscovery::Bye_t> arg(this, *dn__Bye);
+            arg.version = dn__Bye->MetadataVersion ? *dn__Bye->MetadataVersion : 0;
+            p->bye(arg);
         }
 
-        dn__ByeResponse->wsa__EndpointReference = &endpoint_;
+        dn__ByeResponse->soap_default(this);
         return SOAP_OK;
     }
 
@@ -105,35 +157,35 @@ public:
         BOOST_ASSERT(dn__Probe != nullptr && dn__ProbeResponse != nullptr);
 
         if (p != nullptr) {
-            wsd__ScopesType wsdScopes;
-            if (dn__Probe->Scopes != nullptr)
-                wsdScopes = *dn__Probe->Scopes;
-            RemoteDiscovery::Scopes_t scopes(wsdScopes.__item, wsdScopes.MatchBy);
-            probes_ = p->probe(dn__Probe->Types, &scopes);
+            RemoteDiscovery::Probe_t arg;
+            RemoteDiscovery::Scopes_t scopes;
+
+            arg.types = dn__Probe->Types;
+            arg.scopes = nullptr;
+            if (dn__Probe->Scopes != nullptr) {
+                arg.scopes = &scopes;
+                arg.scopes->item = dn__Probe->Scopes->__item;
+                arg.scopes->matchBy = dn__Probe->Scopes->MatchBy;
+            }
+
+            p->probe(arg);
         }
 
-        responce_.resize(probes_.size());
-        dn__ProbeResponse->ProbeMatch.clear();
-        dn__ProbeResponse->ProbeMatch.reserve(responce_.size());
+        dn__ProbeResponse->soap_default(this);
 
-        for (size_t i = 0; i < probes_.size(); ++i) {
-            responce_[i].wsa__EndpointReference = &endpoint_;
-            responce_[i].Types = dn__Probe->Types;
-            responce_[i].Scopes = dn__Probe->Scopes;
-            responce_[i].XAddrs = &probes_[i];
-            responce_[i].MetadataVersion = 0;
+        return SOAP_OK;
+    }
 
-            dn__ProbeResponse->ProbeMatch.push_back(&responce_[i]);
+    int serveProbeMatches()
+    {
+        if (p != nullptr) {
+            p->probeMatches(RemoteDiscovery::ProbeMatches_t(), std::string());
         }
-
         return SOAP_OK;
     }
 
 private:
     Wsa wsa_;
-    wsa__EndpointReferenceType endpoint_;
-    std::vector<std::string> probes_;
-    std::vector<wsd__ProbeMatchType> responce_;
 };
 
 

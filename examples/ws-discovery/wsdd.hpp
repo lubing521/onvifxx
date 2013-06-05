@@ -21,10 +21,10 @@ public:
 
     int exec(bool daemonize);
 
-    virtual void hello(std::string * xaddrs, std::string * types, Scopes_t * scopes);
-    virtual void bye(std::string * xaddrs, std::string * types, Scopes_t * scopes);
-    virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes);
-
+    virtual void hello(const Hello_t & arg);
+    virtual void bye(const Bye_t & arg);
+    virtual void probe(const Probe_t & arg);
+    virtual void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo);
 
 private:
     void runService();

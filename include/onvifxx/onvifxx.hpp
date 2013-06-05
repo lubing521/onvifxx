@@ -66,7 +66,6 @@ private:
     int code_;
 };
 
-
 template<class T>
 struct Proxy : T
 {

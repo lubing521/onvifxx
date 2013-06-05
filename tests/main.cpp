@@ -39,31 +39,35 @@ struct RemoteDiscoveryService : onvifxx::RemoteDiscovery
 {
     boost::mutex readyMutex;
 
-    virtual void hello(std::string * xaddrs, std::string * types, Scopes_t * scopes)
+    virtual void hello(const Hello_t & arg)
     {
         std::clog << "hello("
-                  << (xaddrs != nullptr ? *xaddrs : "") << ", "
-                  << (types != nullptr ? *types : "") << ", "
-                  << (scopes != nullptr ? scopes->first : "")
+                  << (arg.xaddrs != nullptr ? *arg.xaddrs : "") << ", "
+                  << (arg.types != nullptr ? *arg.types : "") << ", "
+                  << (arg.scopes != nullptr ? arg.scopes->item : "")
                   << ")" << std::endl;
     }
 
-    virtual void bye(std::string * xaddrs, std::string * types, Scopes_t * scopes)
+    virtual void bye(const Bye_t & arg)
     {
         std::clog << "bye("
-                  << (xaddrs != nullptr ? *xaddrs : "") << ", "
-                  << (types != nullptr ? *types : "") << ", "
-                  << (scopes != nullptr ? scopes->first : "")
+                  << (arg.xaddrs != nullptr ? *arg.xaddrs : "") << ", "
+                  << (arg.types != nullptr ? *arg.types : "") << ", "
+                  << (arg.scopes != nullptr ? arg.scopes->item : "")
                   << ")" << std::endl;
     }
 
-    virtual ProbeMatches_t probe(std::string * types, Scopes_t * scopes)
+    virtual void probe(const Probe_t & arg)
     {
         std::clog << "probe("
-                  << (types != nullptr ? *types : "") << ", "
-                  << (scopes != nullptr ? scopes->first : "")
+                  << (arg.types != nullptr ? *arg.types : "") << ", "
+                  << (arg.scopes != nullptr ? arg.scopes->item : "")
                   << ")" << std::endl;
-        return ProbeMatches_t();
+    }
+
+    void probeMatches(const ProbeMatches_t &, const std::string &)
+    {
+
     }
 
     virtual void run()
@@ -106,14 +110,33 @@ int main(int argc, char ** argv)
         boost::mutex::scoped_lock lock(service.readyMutex);
         UNUSED(lock);
 
+        std::string address = "urn:uuid:05f1b46c-f29a-46f7-9140-e4bc00c8cea6";
         std::string xaddrs = "http://127.0.0.1/onvif/services";
         std::string types = "dn:NetworkVideoTransmitter";
         boost::scoped_ptr<Proxy_t>  proxy(onvifxx::RemoteDiscovery::proxy());
-//        onvifxx::RemoteDiscovery::ProbeMatches_t matches = proxy->probe(&types, nullptr);
-//        std::copy(matches.begin(), matches.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
 
-        proxy->hello(&xaddrs, &types, nullptr);
-//        proxy->bye(&types, nullptr);
+        onvifxx::RemoteDiscovery::EndpointReference_t endpoint;
+        endpoint.address = &address;
+
+        onvifxx::RemoteDiscovery::Hello_t arg1;
+        onvifxx::RemoteDiscovery::Bye_t arg2;
+        onvifxx::RemoteDiscovery::Probe_t arg3;
+
+        arg1.endpoint = &endpoint;
+        arg1.types = &types;
+        arg1.xaddrs = &xaddrs;
+        arg1.version = 1;
+
+        arg2.endpoint = &endpoint;
+        arg2.types = &types;
+        arg2.xaddrs = &xaddrs;
+        arg2.version = 1;
+
+        arg3.types = &types;
+
+        proxy->hello(arg1);
+        proxy->bye(arg2);
+        proxy->probe(arg3);
 
         service_thread.join();
 

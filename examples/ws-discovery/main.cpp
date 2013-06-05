@@ -20,7 +20,7 @@ std::string baseName(const char * path)
 
 int main(int argc, char * argv[])
 {
-    bool daemonize = (argc == 2 && argv[1] == std::string("-d"));
+    bool daemonize = !(argc == 2 && argv[1] == std::string("-D"));
     if (daemonize)
         std::clog.rdbuf(new Log(baseName(argv[0]), LOG_DAEMON));
     return Wsdd().exec(daemonize);
