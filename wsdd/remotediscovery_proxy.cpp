@@ -197,6 +197,39 @@ public:
             matches.back().MetadataVersion = items[i].version;
             req.ProbeMatch[i] = &matches.back();
         }
+
+        encodingStyle = nullptr;
+        soap_begin(this);
+        soap_serializeheader(this);
+        if (!soap_reference(this, &req, SOAP_TYPE_wsd__ProbeMatchesType))
+            req.soap_serialize(this);
+
+        if (soap_begin_count(this))
+            throw SoapException(this);
+
+        if (mode & SOAP_IO_LENGTH) {
+            if (soap_envelope_begin_out(this)
+             || soap_putheader(this)
+             || soap_body_begin_out(this)
+             || putProbeMatches(&req, "dn:ProbeMatches")
+             || soap_body_end_out(this)
+             || soap_envelope_end_out(this))
+                 throw SoapException(this);
+        }
+
+        if (soap_end_count(this))
+            throw SoapException(this);
+
+        if (soap_connect(this, soap_url(this, soap_endpoint, nullptr), soap_header()->wsa__Action.c_str())
+         || soap_envelope_begin_out(this)
+         || soap_putheader(this)
+         || soap_body_begin_out(this)
+         || putProbeMatches(&req, "dn:ProbeMatches")
+         || soap_body_end_out(this)
+         || soap_envelope_end_out(this)
+         || soap_end_send(this)
+         || soap_closesock(this))
+            throw SoapException(this);
     }
 
 private:
@@ -205,6 +238,12 @@ private:
         std::stringstream ss;
         ss << "soap.udp://" << WSDD_MULTICAT_IP << ":" << WSDD_MULTICAT_PORT;
         return ss.str();
+    }
+
+    int putProbeMatches(const wsd__ProbeMatchesType * a, const char * tag)
+    {
+        int id = soap_element_id(this, tag, -1, a, nullptr, 0, nullptr, SOAP_TYPE_wsd__ProbeMatchesType);
+        return (id < 0) ? error : a->soap_out(this, tag, id, nullptr);
     }
 
 private:

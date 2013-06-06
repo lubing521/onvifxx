@@ -32,10 +32,12 @@ typedef asio::ip::udp AsioUdp_t;
 
 //};
 
-typedef onvifxx::Proxy<onvifxx::RemoteDiscovery> Proxy_t;
-typedef onvifxx::Service<onvifxx::RemoteDiscovery> Service_t;
+typedef onvifxx::RemoteDiscovery RD_t;
 
-struct RemoteDiscoveryService : onvifxx::RemoteDiscovery
+typedef onvifxx::Proxy<RD_t> Proxy_t;
+typedef onvifxx::Service<RD_t> Service_t;
+
+struct RemoteDiscoveryService : RD_t
 {
     boost::mutex readyMutex;
 
@@ -65,9 +67,9 @@ struct RemoteDiscoveryService : onvifxx::RemoteDiscovery
                   << ")" << std::endl;
     }
 
-    void probeMatches(const ProbeMatches_t &, const std::string &)
+    void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo)
     {
-
+        std::clog << "probeMatches(" <<  arg.size() << ", " << relatesTo << ")" << std::endl;
     }
 
     virtual void run()
@@ -113,30 +115,43 @@ int main(int argc, char ** argv)
         std::string address = "urn:uuid:05f1b46c-f29a-46f7-9140-e4bc00c8cea6";
         std::string xaddrs = "http://127.0.0.1/onvif/services";
         std::string types = "dn:NetworkVideoTransmitter";
-        boost::scoped_ptr<Proxy_t>  proxy(onvifxx::RemoteDiscovery::proxy());
+        boost::scoped_ptr<Proxy_t>  proxy(RD_t::proxy());
 
-        onvifxx::RemoteDiscovery::EndpointReference_t endpoint;
+        RD_t::EndpointReference_t endpoint = RD_t::EndpointReference_t();
         endpoint.address = &address;
 
-        onvifxx::RemoteDiscovery::Hello_t arg1;
-        onvifxx::RemoteDiscovery::Bye_t arg2;
-        onvifxx::RemoteDiscovery::Probe_t arg3;
+        RD_t::Scopes_t scopes = RD_t::Scopes_t();
+        scopes.item = "onvif://www.onvif.org/type/Test onvif://www.onvif.org/name/OnvifxxTest";
 
-        arg1.endpoint = &endpoint;
-        arg1.types = &types;
-        arg1.xaddrs = &xaddrs;
-        arg1.version = 1;
+        RD_t::Hello_t hello = RD_t::Hello_t();
+        hello.endpoint = &endpoint;
+        hello.types = &types;
+        hello.scopes = &scopes;
+        hello.xaddrs = &xaddrs;
+        hello.version = 1;
+        proxy->hello(hello);
 
-        arg2.endpoint = &endpoint;
-        arg2.types = &types;
-        arg2.xaddrs = &xaddrs;
-        arg2.version = 1;
+        RD_t::Bye_t bye = RD_t::Bye_t();
+        bye.endpoint = &endpoint;
+        bye.types = &types;
+        bye.scopes = &scopes;
+        bye.xaddrs = &xaddrs;
+        bye.version = 1;
+        proxy->bye(bye);
 
-        arg3.types = &types;
+        RD_t::Probe_t probe = RD_t::Probe_t();
+        probe.types = &types;
+        proxy->probe(probe);
 
-        proxy->hello(arg1);
-        proxy->bye(arg2);
-        proxy->probe(arg3);
+        RD_t::ProbeMatch_t probeMatch = RD_t::ProbeMatch_t();
+        probeMatch.endpoint = &endpoint;
+        probeMatch.types = &types;
+        probeMatch.scopes = &scopes;
+        probeMatch.xaddrs = &xaddrs;
+        probeMatch.version = 1;
+        RD_t::ProbeMatches_t probeMatches = RD_t::ProbeMatches_t();
+        probeMatches.push_back(probeMatch);
+        proxy->probeMatches(probeMatches, "");
 
         service_thread.join();
 

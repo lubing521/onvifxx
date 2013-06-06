@@ -101,14 +101,21 @@ public:
             static const std::string PROBE_MATCHES = "http://www.onvif.org/ver10/network/wsdl/ProbeMatches";
 
             int rv = RemoteDiscoveryBindingService::dispatch();
-            if ((rv != SOAP_OK && rv != SOAP_NO_METHOD) ||
-                (action ? action != PROBE_MATCHES : soap_match_tag(this, tag, "d:ProbeMatches") != 0))
-            {
+            if (rv != SOAP_OK) {
+                if ((rv == SOAP_NO_METHOD)
+                && (action ? action == PROBE_MATCHES : soap_match_tag(this, tag, "d:ProbeMatches") == 0))
+                {
+                    rv = serveProbeMatches();
+                }
+
+                if (rv == SOAP_USER_ERROR) {
+                    soap_closesock(this);
+                    return SOAP_OK;
+                }
+
                 error = rv;
                 throw SoapException(this);
             }
-
-            return serveProbeMatches();
 
         } catch (std::exception & ex) {
             RemoteDiscoveryBindingService::soap_senderfault("RemoteDiscovery", ex.what(), nullptr);
@@ -135,7 +142,7 @@ public:
 
         dn__HelloResponse->soap_default(this);
 
-        return SOAP_OK;
+        return SOAP_USER_ERROR;
     }
 
     virtual int Bye(wsd__ByeType * dn__Bye, wsd__ResolveType * dn__ByeResponse)
@@ -149,7 +156,8 @@ public:
         }
 
         dn__ByeResponse->soap_default(this);
-        return SOAP_OK;
+
+        return SOAP_USER_ERROR;
     }
 
     virtual int Probe(wsd__ProbeType * dn__Probe, wsd__ProbeMatchesType * dn__ProbeResponse)
@@ -173,7 +181,7 @@ public:
 
         dn__ProbeResponse->soap_default(this);
 
-        return SOAP_OK;
+        return SOAP_USER_ERROR;
     }
 
     int serveProbeMatches()
@@ -181,7 +189,8 @@ public:
         if (p != nullptr) {
             p->probeMatches(RemoteDiscovery::ProbeMatches_t(), std::string());
         }
-        return SOAP_OK;
+
+        return SOAP_USER_ERROR;
     }
 
 private:

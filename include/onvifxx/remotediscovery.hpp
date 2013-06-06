@@ -56,7 +56,6 @@ struct RemoteDiscovery
     static Service<RemoteDiscovery> * service();
 };
 
-
 } // namespace onvifxx
 
 #endif // ONVIF_DISCOVERY_HPP
