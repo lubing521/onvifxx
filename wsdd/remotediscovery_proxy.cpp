@@ -7,7 +7,7 @@
 
 namespace onvifxx {
 
-const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
+const std::string TO_TS_URL = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
 
 class RemoteDiscoveryProxy :
         public Proxy<RemoteDiscovery>,

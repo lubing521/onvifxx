@@ -6,8 +6,6 @@
 
 namespace onvifxx {
 
-const std::string TO_TS_URL = "schemas-xmlsoap-org:ws:2005:04:discovery";
-
 class RemoteDiscoveryService :
     public BaseService<RemoteDiscovery, RemoteDiscoveryBindingService>
 {

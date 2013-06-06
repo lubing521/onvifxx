@@ -44,6 +44,13 @@ if(NOT IS_DIRECTORY ${WSDD_SOURCE_DIR})
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
 
+	foreach(NAME "WsddRemoteDiscoveryBindingProxy" "WsddRemoteDiscoveryBindingService" "WsddC")
+		execute_process(
+			COMMAND sed -i s/dn:/wsd:/g src/${NAME}.cpp
+			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+		)
+	endforeach()
+
 	aux_source_directory(${WSDD_SOURCE_DIR} WSDD_SOURCES)
 endif()
 
