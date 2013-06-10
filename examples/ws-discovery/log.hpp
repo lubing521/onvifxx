@@ -36,4 +36,10 @@ private:
 
 std::ostream & operator<< (std::ostream & os, const Log::Priority & priority);
 
+#define LOG std::clog << __FILE__ << ":" << __LINE__ << " "
+
+#define LOG_I LOG << Log::INFO
+#define LOG_W LOG << Log::WARNING
+#define LOG_E LOG << Log::ERROR
+
 #endif // LOG_HPP

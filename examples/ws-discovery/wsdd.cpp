@@ -12,7 +12,7 @@ Wsdd::Wsdd() :
     signals_(ios_),
     stopped_(false)
 {
-    std::clog << Log::INFO << "start" << std::endl;
+    LOG_I  << "start" << std::endl;
     signals_.add(SIGHUP);
     signals_.add(SIGINT);
     signals_.add(SIGQUIT);
@@ -31,7 +31,7 @@ Wsdd::Wsdd() :
 
 Wsdd::~Wsdd()
 {
-    std::clog << Log::INFO << "exit" << std::endl;
+    LOG_I << "exit" << std::endl;
 }
 
 int Wsdd::exec(bool daemonize)
@@ -49,8 +49,9 @@ int Wsdd::exec(bool daemonize)
         ios_.run();
         service_thread.join();
         std::clog << "Service stopped" << std::endl;
+        BOOST_ASSERT(stopped_);
     } catch (const std::exception & ex) {
-        std::clog << Log::WARNING << "Something wrong - " << ex.what();
+        LOG_W << "Something wrong - " << ex.what();
     } while (!stopped_);
 
     return 0;
@@ -116,7 +117,7 @@ void Wsdd::runService()
         while (!ios_.stopped()) {
             std::clog << "Accept" << std::endl;
             if (service->accept() == -1) {
-                std::clog << Log::WARNING << "Accept failed" << std::endl;
+                LOG_W << "Accept failed" << std::endl;
                 continue;
             }
 
@@ -124,7 +125,7 @@ void Wsdd::runService()
             int err = service->serve();
             if (err != 0) {
                 if (err != -1) {
-                    std::clog << Log::WARNING << "Serve failed :"
+                    LOG_W << "Serve failed :"
                               << onvifxx::SoapException(*service).what() << std::endl;
                 }
                 std::clog << "." << std::endl;
@@ -135,13 +136,15 @@ void Wsdd::runService()
             service->destroy();
         }
 
+//        proxy_.reset(onvifxx::RemoteDiscovery::proxy());
+        //proxy_->hello(probeMatches_.back());
         proxy_->bye(probeMatches_.back());
 
     } catch (std::exception & ex) {
-        std::clog << Log::WARNING << ex.what() << std::endl;
+        LOG_W << ex.what() << std::endl;
     }
 
-    std::clog << "The service loop stopped" << std::endl;
+    LOG << "The service loop stopped" << std::endl;
     work_.reset();
 }
 
@@ -156,9 +159,9 @@ void Wsdd::signalHandler(const Error_t & error, int signal)
         stopped_ = signal != SIGHUP;
         ios_.stop();
     } catch (std::exception & ex) {
-        std::clog << Log::WARNING << "Abort on " << ex.what() << std::endl;
+        LOG_W << "Abort on " << ex.what() << std::endl;
         std::terminate();
     }
 
-    std::clog << "Waiting for finish of service" << std::endl;
+    LOG << "Waiting for finish of service" << std::endl;
 }
