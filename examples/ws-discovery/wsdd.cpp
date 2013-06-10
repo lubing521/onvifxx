@@ -45,10 +45,10 @@ int Wsdd::exec(bool daemonize)
     boost::thread service_thread(boost::bind(&Wsdd::runService, this));
 
     do try {
-        std::clog << "Running service loop" << std::endl;
+        std::clog << "Running service" << std::endl;
         ios_.run();
         service_thread.join();
-        std::clog << "Service loop exited" << std::endl;
+        std::clog << "Service stopped" << std::endl;
     } catch (const std::exception & ex) {
         std::clog << Log::WARNING << "Something wrong - " << ex.what();
     } while (!stopped_);
@@ -80,20 +80,6 @@ void Wsdd::probe(const Probe_t & arg)
               << (arg.types != nullptr ? *arg.types : "") << ", "
               << (arg.scopes != nullptr ? arg.scopes->item : "")
               << ")" << std::endl;
-
-//    ProbeMatches_t rv;
-//    if (types && types->find_first_of("dn:NetworkVideoTransmitter") == std::string::npos)
-//        return rv;
-
-//    if (scopes != nullptr && !scopes->first.empty()) {
-//        boost::tokenizer<> tokens(scopes->first);
-//        if (std::find_first_of(tokens.begin(), tokens.end(), scopes_.begin(), scopes_.end()) == tokens.end())
-//            return rv;
-//    }
-
-//    rv.push_back("http://127.0.0.1/onvif/device_service");
-
-//    std::clog << "probe matches" << std::endl;
 }
 
 void Wsdd::probeMatches(const ProbeMatches_t &, const std::string &)
@@ -108,20 +94,20 @@ void Wsdd::runService()
         std::string xaddrs = "http://127.0.0.1/onvif/services";
         std::string types = "dn:NetworkVideoTransmitter";
 
-        Scopes_t scopes;
+        Scopes_t scopes = Scopes_t();
         scopes.item = boost::algorithm::join(scopes_, " ");
-        onvifxx::RemoteDiscovery::EndpointReference_t endpoint;
+        EndpointReference_t endpoint = EndpointReference_t();
         endpoint.address = &address;
 
-        boost::scoped_ptr<Proxy_t> proxy(onvifxx::RemoteDiscovery::proxy());
+        probeMatches_.resize(1);
+        probeMatches_.back().endpoint = &endpoint;
+        probeMatches_.back().scopes = &scopes;
+        probeMatches_.back().types = &types;
+        probeMatches_.back().xaddrs = &xaddrs;
+        probeMatches_.back().version = 1;
 
-        onvifxx::RemoteDiscovery::Hello_t hello;
-        hello.endpoint = &endpoint;
-        hello.scopes = &scopes;
-        hello.types = &types;
-        hello.xaddrs = &xaddrs;
-        hello.version = 1;
-        proxy->hello(hello);
+        proxy_.reset(onvifxx::RemoteDiscovery::proxy());
+        proxy_->hello(probeMatches_.back());
 
         std::clog << "Starting the service loop" << std::endl;
         boost::scoped_ptr<Service_t> service(onvifxx::RemoteDiscovery::service());
@@ -149,13 +135,7 @@ void Wsdd::runService()
             service->destroy();
         }
 
-        onvifxx::RemoteDiscovery::Bye_t bye;
-        bye.endpoint = &endpoint;
-        bye.scopes = &scopes;
-        bye.types = &types;
-        bye.xaddrs = &xaddrs;
-        bye.version = 1;
-        proxy->bye(bye);
+        proxy_->bye(probeMatches_.back());
 
     } catch (std::exception & ex) {
         std::clog << Log::WARNING << ex.what() << std::endl;

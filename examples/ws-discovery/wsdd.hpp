@@ -35,7 +35,10 @@ private:
     boost::asio::io_service ios_;
     boost::asio::signal_set signals_;
     boost::scoped_ptr<boost::asio::io_service::work> work_;
+
     std::vector<std::string> scopes_;
+    ProbeMatches_t probeMatches_;
+    boost::scoped_ptr<Proxy_t> proxy_;
 };
 
 #endif // WSDD_HPP
