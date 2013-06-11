@@ -136,8 +136,8 @@ void Wsdd::runService()
             service->destroy();
         }
 
-//        proxy_.reset(onvifxx::RemoteDiscovery::proxy());
-        //proxy_->hello(probeMatches_.back());
+        service.reset();
+        proxy_.reset(onvifxx::RemoteDiscovery::proxy());
         proxy_->bye(probeMatches_.back());
     } catch (std::exception & ex) {
         LOG_W << ex.what() << std::endl;
