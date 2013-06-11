@@ -76,6 +76,11 @@ public:
         recv_timeout = RECV_TIMEOUT;
     }
 
+    virtual ~RemoteDiscoveryProxy()
+    {
+        destroy();
+        soap_done(this);
+    }
 
     static uint & instanceId()
     {

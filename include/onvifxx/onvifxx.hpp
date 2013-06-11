@@ -77,9 +77,7 @@ struct Proxy : T
 template<class T>
 struct Service
 {
-    virtual ~Service()
-    {
-    }
+    virtual ~Service() {}
 
     virtual operator soap *() = 0;
 

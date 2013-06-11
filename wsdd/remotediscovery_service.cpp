@@ -67,6 +67,12 @@ public:
         this->accept_timeout = TIMEOUT;
     }
 
+    virtual ~RemoteDiscoveryService()
+    {
+        destroy();
+        soap_done(this);
+    }
+
     virtual operator soap *()
     {
         return this;
