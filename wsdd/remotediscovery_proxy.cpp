@@ -79,7 +79,7 @@ public:
 
     static uint & instanceId()
     {
-        static uint rv = 1;
+        static uint rv = time(nullptr);
         return rv;
     }
 
@@ -91,7 +91,8 @@ public:
 
     static uint & messageNumber()
     {
-        static uint rv = 1;
+        static uint rv = 0;
+        ++rv;
         return rv;
     }
 
@@ -131,6 +132,12 @@ public:
         // Header
         wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Hello");
 
+        wsd__AppSequenceType app_sequence;
+        app_sequence.soap_default(this);
+        app_sequence.InstanceId = instanceId();
+        app_sequence.MessageNumber = messageNumber();
+        header->wsd__AppSequence = &app_sequence;
+
         // Body
         TypeImpl<wsd__HelloType> req(this, arg);
         req.MetadataVersion = arg.version;
@@ -143,10 +150,18 @@ public:
         // Header
         wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Bye");
 
+        wsd__AppSequenceType app_sequence;
+        app_sequence.soap_default(this);
+        app_sequence.InstanceId = instanceId();
+        app_sequence.MessageNumber = messageNumber();
+        header->wsd__AppSequence = &app_sequence;
+
         // Body
         TypeImpl<wsd__ByeType> req(this, arg);
-        unsigned int version = arg.version;
-        req.MetadataVersion = &version;
+        req.Types = nullptr;
+        req.Scopes = nullptr;
+        req.XAddrs = nullptr;
+        //req.MetadataVersion = &arg.version;
         if (Bye(&req, nullptr) != 0)
             throw SoapException(this);
     }
