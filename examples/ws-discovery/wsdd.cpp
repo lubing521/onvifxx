@@ -37,7 +37,7 @@ Wsdd::~Wsdd()
 int Wsdd::exec(bool daemonize)
 {
     if (daemonize && daemon(0, 0) < 0) {
-        std::cerr << "Could not daemonize " << errno << std::endl;
+        LOG_E << "Could not daemonize - " << strerror(errno) << std::endl;
         return 1;
     }
 
@@ -45,10 +45,10 @@ int Wsdd::exec(bool daemonize)
     boost::thread service_thread(boost::bind(&Wsdd::runService, this));
 
     do try {
-        std::clog << "Running service" << std::endl;
+        LOG << "Running service" << std::endl;
         ios_.run();
         service_thread.join();
-        std::clog << "Service stopped" << std::endl;
+        LOG << "Service stopped" << std::endl;
         BOOST_ASSERT(stopped_);
     } catch (const std::exception & ex) {
         LOG_W << "Something wrong - " << ex.what();
@@ -59,7 +59,7 @@ int Wsdd::exec(bool daemonize)
 
 void Wsdd::hello(const Hello_t & arg)
 {
-    std::clog << "hello("
+    LOG << "hello("
               << (arg.xaddrs != nullptr ? *arg.xaddrs : "") << ", "
               << (arg.types != nullptr ? *arg.types : "") << ", "
               << (arg.scopes != nullptr ? arg.scopes->item : "")
@@ -68,7 +68,7 @@ void Wsdd::hello(const Hello_t & arg)
 
 void Wsdd::bye(const Bye_t & arg)
 {
-    std::clog << "bye("
+    LOG << "bye("
               << (arg.xaddrs != nullptr ? *arg.xaddrs : "") << ", "
               << (arg.types != nullptr ? *arg.types : "") << ", "
               << (arg.scopes != nullptr ? arg.scopes->item : "")
@@ -77,7 +77,7 @@ void Wsdd::bye(const Bye_t & arg)
 
 void Wsdd::probe(const Probe_t & arg)
 {
-    std::clog << "probe("
+    LOG << "probe("
               << (arg.types != nullptr ? *arg.types : "") << ", "
               << (arg.scopes != nullptr ? arg.scopes->item : "")
               << ")" << std::endl;
@@ -90,7 +90,7 @@ void Wsdd::probeMatches(const ProbeMatches_t &, const std::string &)
 void Wsdd::runService()
 {
     try {
-        std::clog << "Sending hello" << std::endl;
+        LOG << "Sending hello" << std::endl;
         std::string address = "urn:uuid:05f1b46c-f29a-46f7-9140-e4bc00c8cea6";
         std::string xaddrs = "http://127.0.0.1/onvif/services";
         std::string types = "dn:NetworkVideoTransmitter";
@@ -110,36 +110,35 @@ void Wsdd::runService()
         proxy_.reset(onvifxx::RemoteDiscovery::proxy());
         proxy_->hello(probeMatches_.back());
 
-        std::clog << "Starting the service loop" << std::endl;
+        LOG << "Starting the service loop" << std::endl;
         boost::scoped_ptr<Service_t> service(onvifxx::RemoteDiscovery::service());
         service->bind(this);
 
         while (!ios_.stopped()) {
-            std::clog << "Accept" << std::endl;
+            LOG << "Accept" << std::endl;
             if (service->accept() == -1) {
                 LOG_W << "Accept failed" << std::endl;
                 continue;
             }
 
-            std::clog << "Serve" << std::endl;
+            LOG << "Serve" << std::endl;
             int err = service->serve();
             if (err != 0) {
                 if (err != -1) {
                     LOG_W << "Serve failed :"
                               << onvifxx::SoapException(*service).what() << std::endl;
                 }
-                std::clog << "." << std::endl;
+                LOG << "." << std::endl;
                 continue;
             }
 
-            std::clog << "Clear" << std::endl;
+            LOG << "Clear" << std::endl;
             service->destroy();
         }
 
 //        proxy_.reset(onvifxx::RemoteDiscovery::proxy());
         //proxy_->hello(probeMatches_.back());
         proxy_->bye(probeMatches_.back());
-
     } catch (std::exception & ex) {
         LOG_W << ex.what() << std::endl;
     }
@@ -153,7 +152,7 @@ void Wsdd::signalHandler(const Error_t & error, int signal)
     if (error)
         return;
 
-    std::clog << "A signal occurred " << signal << std::endl;
+    LOG << "A signal occurred " << signal << std::endl;
 
     try {
         stopped_ = signal != SIGHUP;
