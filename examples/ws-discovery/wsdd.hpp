@@ -23,8 +23,8 @@ public:
 
     virtual void hello(const Hello_t & arg);
     virtual void bye(const Bye_t & arg);
-    virtual void probe(const Probe_t & arg);
-    virtual void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo);
+    virtual ProbeMatches_t probe(const Probe_t & arg);
+    //virtual void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo);
 
 private:
     void runService();

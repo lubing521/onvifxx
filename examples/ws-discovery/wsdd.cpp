@@ -75,17 +75,21 @@ void Wsdd::bye(const Bye_t & arg)
               << ")" << std::endl;
 }
 
-void Wsdd::probe(const Probe_t & arg)
+Wsdd::ProbeMatches_t  Wsdd::probe(const Probe_t & arg)
 {
     LOG << "probe("
               << (arg.types != nullptr ? *arg.types : "") << ", "
               << (arg.scopes != nullptr ? arg.scopes->item : "")
               << ")" << std::endl;
+
+//    proxy_->probeMatches(probeMatches_, "");
+
+    return probeMatches_;
 }
 
-void Wsdd::probeMatches(const ProbeMatches_t &, const std::string &)
-{
-}
+//void Wsdd::probeMatches(const ProbeMatches_t &, const std::string &)
+//{
+//}
 
 void Wsdd::runService()
 {

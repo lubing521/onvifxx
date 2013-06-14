@@ -1,5 +1,4 @@
 #include "wsa.hpp"
-#include <WsddH.h>
 //#include <wsaapi.h>
 
 namespace {

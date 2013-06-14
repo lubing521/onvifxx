@@ -59,7 +59,7 @@ struct RemoteDiscoveryService : RD_t
                   << ")" << std::endl;
     }
 
-    virtual void probe(const Probe_t & arg)
+    virtual ProbeMatches_t probe(const Probe_t & arg)
     {
         std::clog << "probe("
                   << (arg.types != nullptr ? *arg.types : "") << ", "
@@ -67,10 +67,10 @@ struct RemoteDiscoveryService : RD_t
                   << ")" << std::endl;
     }
 
-    void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo)
-    {
-        std::clog << "probeMatches(" <<  arg.size() << ", " << relatesTo << ")" << std::endl;
-    }
+//    void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo)
+//    {
+//        std::clog << "probeMatches(" <<  arg.size() << ", " << relatesTo << ")" << std::endl;
+//    }
 
     virtual void run()
     {
@@ -151,7 +151,7 @@ int main(int argc, char ** argv)
         probeMatch.version = 1;
         RD_t::ProbeMatches_t probeMatches = RD_t::ProbeMatches_t();
         probeMatches.push_back(probeMatch);
-        proxy->probeMatches(probeMatches, "");
+        //proxy->probeMatches(probeMatches, "");
 
         service_thread.join();
 

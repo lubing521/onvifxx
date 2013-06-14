@@ -49,8 +49,8 @@ struct RemoteDiscovery
 
     virtual void hello(const Hello_t & arg) = 0;
     virtual void bye(const Bye_t & arg) = 0;
-    virtual void probe(const Probe_t & arg) = 0;
-    virtual void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo) = 0;
+    virtual ProbeMatches_t probe(const Probe_t & arg) = 0;
+    //virtual void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo) = 0;
 
     static Proxy<RemoteDiscovery> * proxy();
     static Service<RemoteDiscovery> * service();

@@ -20,6 +20,7 @@
 #endif
 
 #include <onvifxx/onvifxx.hpp>
+#include <WsddH.h>
 
 class Wsa
 {
@@ -41,6 +42,55 @@ public:
     int reply(const std::string & id, const std::string & action);
     int request(const std::string & to, const std::string & action);
 
+
+    template<class T>
+    class Request : public T
+    {
+    public:
+        template<class P>
+        Request(struct soap * soap, const P & arg)
+        {
+            T::soap_default(soap);
+            T::Types = arg.types;
+            T::XAddrs = arg.xaddrs;
+
+            if (arg.scopes != nullptr) {
+                T::Scopes = &scopes_;
+                T::Scopes->soap_default(soap);
+                T::Scopes->__item = arg.scopes->item;
+                T::Scopes->MatchBy = arg.scopes->matchBy;
+            }
+
+            if (arg.endpoint != nullptr) {
+                T::wsa__EndpointReference = &endpoint_;
+                T::wsa__EndpointReference->soap_default(soap);
+                if (arg.endpoint->address != nullptr) {
+                    T::wsa__EndpointReference->Address = &address_;
+                    T::wsa__EndpointReference->Address->soap_default(soap);
+                    T::wsa__EndpointReference->Address->__item = *arg.endpoint->address;
+                }
+                if (arg.endpoint->portType != nullptr) {
+                    T::wsa__EndpointReference->PortType = &port_;
+                    T::wsa__EndpointReference->PortType->soap_default(soap);
+                    T::wsa__EndpointReference->PortType->__item = *arg.endpoint->portType;
+                }
+
+                if (arg.endpoint->serviceName != nullptr) {
+                    T::wsa__EndpointReference->ServiceName = &service_;
+                    T::wsa__EndpointReference->ServiceName->soap_default(soap);
+                    T::wsa__EndpointReference->ServiceName->__item = arg.endpoint->serviceName->item;
+                    T::wsa__EndpointReference->ServiceName->PortName = arg.endpoint->serviceName->portName;
+                }
+            }
+        }
+
+    private:
+        wsd__ScopesType scopes_;
+        wsa__EndpointReferenceType endpoint_;
+        wsa__AttributedURI address_;
+        wsa__AttributedQName port_;
+        wsa__ServiceNameType service_;
+    };
 
 private:
     soap * soap_;

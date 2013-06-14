@@ -13,11 +13,11 @@ class RemoteDiscoveryService :
     static const uint APP_MAX_DELAY = 500;
 
     template<class T>
-    class TypeImpl : public T
+    class Arg : public T
     {
     public:
         template<class P>
-        TypeImpl(struct soap * soap, const P & arg)
+        Arg(struct soap * soap, const P & arg)
         {
             T::types = arg.Types;
             T::xaddrs = arg.XAddrs;
@@ -57,6 +57,8 @@ class RemoteDiscoveryService :
         RemoteDiscovery::EndpointReference_t endpoint_;
         RemoteDiscovery::EndpointReference_t::ServiceName service_;
     };
+
+    typedef std::vector<Wsa::Request<wsd__ProbeMatchType> > Matches_t;
 
 public:
     RemoteDiscoveryService() :
@@ -106,11 +108,11 @@ public:
 
             int rv = RemoteDiscoveryBindingService::dispatch();
             if (rv != SOAP_OK) {
-                if ((rv == SOAP_NO_METHOD)
-                && (action ? action == PROBE_MATCHES : soap_match_tag(this, tag, "d:ProbeMatches") == 0))
-                {
-                    rv = serveProbeMatches();
-                }
+//                if ((rv == SOAP_NO_METHOD)
+//                && (action ? action == PROBE_MATCHES : soap_match_tag(this, tag, "d:ProbeMatches") == 0))
+//                {
+//                    rv = serveProbeMatches();
+//                }
 
                 if (rv == SOAP_USER_ERROR) {
                     soap_closesock(this);
@@ -134,28 +136,29 @@ public:
         return new RemoteDiscoveryService;
     }
 
-    virtual int Hello(wsd__HelloType * dn__Hello, wsd__ResolveType * dn__HelloResponse)
+    virtual int Hello(wsd__HelloType * wsd__Hello, wsd__ResolveType * wsd__HelloResponse)
     {
-        BOOST_ASSERT(dn__Hello != nullptr && dn__HelloResponse != nullptr);
+        BOOST_ASSERT(wsd__Hello != nullptr && wsd__HelloResponse != nullptr);
 
         if (p != nullptr) {
-            TypeImpl<RemoteDiscovery::Hello_t> arg(this, *dn__Hello);
-            arg.version = dn__Hello->MetadataVersion;
+            Arg<RemoteDiscovery::Hello_t> arg(this, *wsd__Hello);
+            arg.version = wsd__Hello->MetadataVersion;
             p->hello(arg);
         }
 
-        dn__HelloResponse->soap_default(this);
+        wsd__HelloResponse->soap_default(this);
 
         return SOAP_USER_ERROR;
     }
 
-    virtual int Bye(wsd__ByeType * dn__Bye, wsd__ResolveType * dn__ByeResponse)
+    virtual int Bye(wsd__ByeType * wsd__Bye, wsd__ResolveType * dn__ByeResponse)
     {
-        BOOST_ASSERT(dn__Bye != nullptr && dn__ByeResponse != nullptr);
+        BOOST_ASSERT(wsd__Bye != nullptr && dn__ByeResponse != nullptr);
 
         if (p != nullptr) {
-            TypeImpl<RemoteDiscovery::Bye_t> arg(this, *dn__Bye);
-            arg.version = dn__Bye->MetadataVersion ? *dn__Bye->MetadataVersion : 0;
+            Arg<RemoteDiscovery::Bye_t> arg(this, *wsd__Bye);
+
+            arg.version = wsd__Bye->MetadataVersion ? *wsd__Bye->MetadataVersion : 0;
             p->bye(arg);
         }
 
@@ -164,41 +167,92 @@ public:
         return SOAP_USER_ERROR;
     }
 
-    virtual int Probe(wsd__ProbeType * dn__Probe, wsd__ProbeMatchesType * dn__ProbeResponse)
+    virtual int Probe(wsd__ProbeType * wsd__Probe, wsd__ProbeMatchesType * wsd__ProbeResponse)
     {
-        BOOST_ASSERT(dn__Probe != nullptr && dn__ProbeResponse != nullptr);
+        BOOST_ASSERT(wsd__Probe != nullptr && wsd__ProbeResponse != nullptr);
 
         if (p != nullptr) {
             RemoteDiscovery::Probe_t arg;
             RemoteDiscovery::Scopes_t scopes;
 
-            arg.types = dn__Probe->Types;
+            arg.types = wsd__Probe->Types;
             arg.scopes = nullptr;
-            if (dn__Probe->Scopes != nullptr) {
+            if (wsd__Probe->Scopes != nullptr) {
                 arg.scopes = &scopes;
-                arg.scopes->item = dn__Probe->Scopes->__item;
-                arg.scopes->matchBy = dn__Probe->Scopes->MatchBy;
+                arg.scopes->item = wsd__Probe->Scopes->__item;
+                arg.scopes->matchBy = wsd__Probe->Scopes->MatchBy;
             }
 
-            p->probe(arg);
+            // Header
+            wsa_.request("", SOAP_NAMESPACE_OF_wsd"/ProbeMatches");
+            //wsa_.addRelatesTo(soap_header(this)->wsa__MessageID);
+
+            // Body
+            wsd__ProbeMatchesType req;
+            req.soap_default(this);
+
+            RemoteDiscovery::ProbeMatches_t items = p->probe(arg);
+            matches_.reserve(items.size());
+
+            // Fill the result array wsd__ProbeMatchType, converted from ProbeMatch;
+            wsd__ProbeResponse->ProbeMatch.resize(items.size());
+            for (size_t i = 0, sz = items.size(); i < sz; ++i) {
+                matches_.push_back(Matches_t::value_type(this, items[i]));
+                matches_.back().MetadataVersion = items[i].version;
+                wsd__ProbeResponse->ProbeMatch[i] = &matches_.back();
+            }
+
+            soap_serializeheader(this);
+            wsd__ProbeResponse->soap_serialize(this);
+            if (soap_begin_count(this))
+                return error;
+
+            if (mode & SOAP_IO_LENGTH) {
+                if (soap_envelope_begin_out(this)
+                 || soap_putheader(this)
+                 || soap_body_begin_out(this)
+                 || wsd__ProbeResponse->soap_put(this, "wsd:ProbeMatches", "")
+                 || soap_body_end_out(this)
+                 || soap_envelope_end_out(this))
+                     return error;
+            };
+            if (soap_end_count(this)
+             || soap_response(this, SOAP_OK)
+             || soap_envelope_begin_out(this)
+             || soap_putheader(this)
+             || soap_body_begin_out(this)
+             || wsd__ProbeResponse->soap_put(this, "wsd:ProbeMatches", "")
+             || soap_body_end_out(this)
+             || soap_envelope_end_out(this)
+             || soap_end_send(this))
+                return error;
         }
 
-        dn__ProbeResponse->soap_default(this);
 
         return SOAP_USER_ERROR;
+
     }
 
-    int serveProbeMatches()
-    {
-        if (p != nullptr) {
-            p->probeMatches(RemoteDiscovery::ProbeMatches_t(), std::string());
-        }
+//private:
+//    int serveProbeMatches()
+//    {
+//        if (p != nullptr) {
+//            p->probeMatches(RemoteDiscovery::ProbeMatches_t(), std::string());
+//        }
 
-        return SOAP_USER_ERROR;
-    }
+//        return SOAP_USER_ERROR;
+//    }
+
+//    int putProbeMatches(const wsd__ProbeMatchesType * a, const char * tag)
+//    {
+//        int id = soap_element_id(this, tag, -1, a, nullptr, 0, nullptr, SOAP_TYPE_wsd__ProbeMatchesType);
+//        return (id < 0) ? error : a->soap_out(this, tag, id, nullptr);
+//    }
+
 
 private:
     Wsa wsa_;
+    Matches_t matches_;
 };
 
 

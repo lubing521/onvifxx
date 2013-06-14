@@ -18,54 +18,6 @@ class RemoteDiscoveryProxy :
 
     static const uint APP_MAX_DELAY = 500;
 
-    template<class T>
-    class TypeImpl : public T
-    {
-    public:
-        template<class P>
-        TypeImpl(struct soap * soap, const P & arg)
-        {
-            T::soap_default(soap);
-            T::Types = arg.types;
-            T::XAddrs = arg.xaddrs;
-
-            if (arg.scopes != nullptr) {
-                T::Scopes = &scopes_;
-                T::Scopes->soap_default(soap);
-                T::Scopes->__item = arg.scopes->item;
-                T::Scopes->MatchBy = arg.scopes->matchBy;
-            }
-
-            if (arg.endpoint != nullptr) {
-                T::wsa__EndpointReference = &endpoint_;
-                T::wsa__EndpointReference->soap_default(soap);
-                if (arg.endpoint->address != nullptr) {
-                    T::wsa__EndpointReference->Address = &address_;
-                    T::wsa__EndpointReference->Address->soap_default(soap);
-                    T::wsa__EndpointReference->Address->__item = *arg.endpoint->address;
-                }
-                if (arg.endpoint->portType != nullptr) {
-                    T::wsa__EndpointReference->PortType = &port_;
-                    T::wsa__EndpointReference->PortType->soap_default(soap);
-                    T::wsa__EndpointReference->PortType->__item = *arg.endpoint->portType;
-                }
-
-                if (arg.endpoint->serviceName != nullptr) {
-                    T::wsa__EndpointReference->ServiceName = &service_;
-                    T::wsa__EndpointReference->ServiceName->soap_default(soap);
-                    T::wsa__EndpointReference->ServiceName->__item = arg.endpoint->serviceName->item;
-                    T::wsa__EndpointReference->ServiceName->PortName = arg.endpoint->serviceName->portName;
-                }
-            }
-        }
-
-    private:
-        wsd__ScopesType scopes_;
-        wsa__EndpointReferenceType endpoint_;
-        wsa__AttributedURI address_;
-        wsa__AttributedQName port_;
-        wsa__ServiceNameType service_;
-    };
 
 public:
     RemoteDiscoveryProxy() :
@@ -144,7 +96,7 @@ public:
         header->wsd__AppSequence = &app_sequence;
 
         // Body
-        TypeImpl<wsd__HelloType> req(this, arg);
+        Wsa::Request<wsd__HelloType> req(this, arg);
         req.MetadataVersion = arg.version;
         if (Hello(&req, nullptr) != 0)
             throw SoapException(this);
@@ -162,7 +114,7 @@ public:
         header->wsd__AppSequence = &app_sequence;
 
         // Body
-        TypeImpl<wsd__ByeType> req(this, arg);
+        Wsa::Request<wsd__ByeType> req(this, arg);
         req.Types = nullptr;
         req.Scopes = nullptr;
         req.XAddrs = nullptr;
@@ -171,7 +123,7 @@ public:
             throw SoapException(this);
     }
 
-    virtual void probe(const Probe_t & arg)
+    virtual ProbeMatches_t probe(const Probe_t & arg)
     {
         // Header
         wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Probe");
@@ -193,64 +145,64 @@ public:
             throw SoapException(this);
     }
 
-    virtual void probeMatches(const ProbeMatches_t & items, const std::string & relatesTo)
-    {
-        // Header
-        wsa_.request("", SOAP_NAMESPACE_OF_wsd"/ProbeMatches");
-        wsa_.addRelatesTo(relatesTo);
+//    virtual void probeMatches(const ProbeMatches_t & items, const std::string & relatesTo)
+//    {
+//        // Header
+//        wsa_.request("", SOAP_NAMESPACE_OF_wsd"/ProbeMatches");
+//        wsa_.addRelatesTo(relatesTo);
 
-        wsd__AppSequenceType app_sequence;
-        app_sequence.soap_default(this);
-        app_sequence.InstanceId = instanceId();
-        app_sequence.MessageNumber = messageNumber();
-        header->wsd__AppSequence = &app_sequence;
+//        wsd__AppSequenceType app_sequence;
+//        app_sequence.soap_default(this);
+//        app_sequence.InstanceId = instanceId();
+//        app_sequence.MessageNumber = messageNumber();
+//        header->wsd__AppSequence = &app_sequence;
 
-        // Body
-        wsd__ProbeMatchesType req;
-        req.soap_default(this);
+//        // Body
+//        wsd__ProbeMatchesType req;
+//        req.soap_default(this);
 
-        std::vector<TypeImpl<wsd__ProbeMatchType> > matches;
-        matches.reserve(items.size());
-        req.ProbeMatch.resize(items.size());
-        for (size_t i = 0, sz = items.size(); i < sz; ++i) {
-            matches.push_back(TypeImpl<wsd__ProbeMatchType>(this, items[i]));
-            matches.back().MetadataVersion = items[i].version;
-            req.ProbeMatch[i] = &matches.back();
-        }
+//        std::vector<TypeImpl<wsd__ProbeMatchType> > matches;
+//        matches.reserve(items.size());
+//        req.ProbeMatch.resize(items.size());
+//        for (size_t i = 0, sz = items.size(); i < sz; ++i) {
+//            matches.push_back(TypeImpl<wsd__ProbeMatchType>(this, items[i]));
+//            matches.back().MetadataVersion = items[i].version;
+//            req.ProbeMatch[i] = &matches.back();
+//        }
 
-        encodingStyle = nullptr;
-        soap_begin(this);
-        soap_serializeheader(this);
-        if (!soap_reference(this, &req, SOAP_TYPE_wsd__ProbeMatchesType))
-            req.soap_serialize(this);
+//        encodingStyle = nullptr;
+//        soap_begin(this);
+//        soap_serializeheader(this);
+//        if (!soap_reference(this, &req, SOAP_TYPE_wsd__ProbeMatchesType))
+//            req.soap_serialize(this);
 
-        if (soap_begin_count(this))
-            throw SoapException(this);
+//        if (soap_begin_count(this))
+//            throw SoapException(this);
 
-        if (mode & SOAP_IO_LENGTH) {
-            if (soap_envelope_begin_out(this)
-             || soap_putheader(this)
-             || soap_body_begin_out(this)
-             || putProbeMatches(&req, "dn:ProbeMatches")
-             || soap_body_end_out(this)
-             || soap_envelope_end_out(this))
-                 throw SoapException(this);
-        }
+//        if (mode & SOAP_IO_LENGTH) {
+//            if (soap_envelope_begin_out(this)
+//             || soap_putheader(this)
+//             || soap_body_begin_out(this)
+//             || putProbeMatches(&req, "dn:ProbeMatches")
+//             || soap_body_end_out(this)
+//             || soap_envelope_end_out(this))
+//                 throw SoapException(this);
+//        }
 
-        if (soap_end_count(this))
-            throw SoapException(this);
+//        if (soap_end_count(this))
+//            throw SoapException(this);
 
-        if (soap_connect(this, soap_url(this, soap_endpoint, nullptr), soap_header()->wsa__Action.c_str())
-         || soap_envelope_begin_out(this)
-         || soap_putheader(this)
-         || soap_body_begin_out(this)
-         || putProbeMatches(&req, "dn:ProbeMatches")
-         || soap_body_end_out(this)
-         || soap_envelope_end_out(this)
-         || soap_end_send(this)
-         || soap_closesock(this))
-            throw SoapException(this);
-    }
+//        if (soap_connect(this, soap_url(this, soap_endpoint, nullptr), soap_header()->wsa__Action.c_str())
+//         || soap_envelope_begin_out(this)
+//         || soap_putheader(this)
+//         || soap_body_begin_out(this)
+//         || putProbeMatches(&req, "dn:ProbeMatches")
+//         || soap_body_end_out(this)
+//         || soap_envelope_end_out(this)
+//         || soap_end_send(this)
+//         || soap_closesock(this))
+//            throw SoapException(this);
+//    }
 
 private:
     static std::string url()
@@ -258,12 +210,6 @@ private:
         std::stringstream ss;
         ss << "soap.udp://" << WSDD_MULTICAT_IP << ":" << WSDD_MULTICAT_PORT;
         return ss.str();
-    }
-
-    int putProbeMatches(const wsd__ProbeMatchesType * a, const char * tag)
-    {
-        int id = soap_element_id(this, tag, -1, a, nullptr, 0, nullptr, SOAP_TYPE_wsd__ProbeMatchesType);
-        return (id < 0) ? error : a->soap_out(this, tag, id, nullptr);
     }
 
 private:
