@@ -4,7 +4,7 @@
 #include <boost/thread.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
-#include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <iostream>
 
@@ -82,14 +82,43 @@ Wsdd::ProbeMatches_t  Wsdd::probe(const Probe_t & arg)
               << (arg.scopes != nullptr ? arg.scopes->item : "")
               << ")" << std::endl;
 
-//    proxy_->probeMatches(probeMatches_, "");
+    bool matched = true;
+    if (arg.types != nullptr && probeMatches_.back().types != nullptr) {
+        std::string types = *arg.types;
+        while (true) {
+            std::size_t pos1 = types.rfind(':');
+            if (pos1 == std::string::npos)
+                break;
 
-    return probeMatches_;
+            std::size_t pos2 = types.rfind(' ', pos1);
+            if (pos2 == std::string::npos)
+                pos2 = 0;
+            else
+                ++pos2;
+
+            types.erase(pos2, pos1 - pos2 + 1);
+        }
+
+        matched = isMatched(types, *probeMatches_.back().types);
+    }
+
+    if (matched && arg.scopes != nullptr && probeMatches_.back().scopes != nullptr)
+        matched = isMatched(arg.scopes->item, probeMatches_.back().scopes->item);
+
+    return matched ? probeMatches_ : Wsdd::ProbeMatches_t();
 }
 
-//void Wsdd::probeMatches(const ProbeMatches_t &, const std::string &)
-//{
-//}
+bool Wsdd::isMatched(const std::string & left, const std::string & right)
+{
+    std::vector<std::string> l;
+    std::vector<std::string> r;
+
+    namespace ba = boost::algorithm;
+    ba::split(l, left, ba::is_space(), ba::token_compress_on);
+    ba::split(r, right, ba::is_space(), ba::token_compress_on);
+
+    return std::find_first_of(l.begin(), l.end(), r.begin(), r.end()) != l.end();
+}
 
 void Wsdd::runService()
 {
@@ -97,7 +126,7 @@ void Wsdd::runService()
         LOG << "Sending hello" << std::endl;
         std::string address = "urn:uuid:05f1b46c-f29a-46f7-9140-e4bc00c8cea6";
         std::string xaddrs = "http://127.0.0.1/onvif/services";
-        std::string types = "dn:NetworkVideoTransmitter";
+        std::string types = "NetworkVideoTransmitter";
 
         Scopes_t scopes = Scopes_t();
         scopes.item = boost::algorithm::join(scopes_, " ");

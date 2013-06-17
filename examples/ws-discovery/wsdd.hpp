@@ -27,6 +27,8 @@ public:
     //virtual void probeMatches(const ProbeMatches_t & arg, const std::string & relatesTo);
 
 private:
+    static bool isMatched(const std::string & left, const std::string & right);
+
     void runService();
     void signalHandler(const Error_t & error, int signal);
 
