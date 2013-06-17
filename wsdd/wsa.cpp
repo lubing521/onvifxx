@@ -145,6 +145,8 @@ int Wsa::addRelatesTo(const std::string & relatesTo)
         return SOAP_ERR;
 
     if (!relatesTo.empty()) {
+        soap_->header->SOAP_WSA(RelatesTo) = new wsa__Relationship;
+        soap_->header->SOAP_WSA(RelatesTo)->soap_default(soap_);
         soap_->header->SOAP_WSA(RelatesTo)->__item = relatesTo;
     }
 

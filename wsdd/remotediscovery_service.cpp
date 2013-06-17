@@ -184,8 +184,9 @@ public:
             }
 
             // Header
+            std::string relatesTo = soap_header()->wsa__MessageID;
             wsa_.request("", SOAP_NAMESPACE_OF_wsd"/ProbeMatches");
-            //wsa_.addRelatesTo(soap_header(this)->wsa__MessageID);
+            wsa_.addRelatesTo(relatesTo);
 
             // Body
             wsd__ProbeMatchesType req;
