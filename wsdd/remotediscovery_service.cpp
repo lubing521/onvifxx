@@ -204,30 +204,32 @@ public:
                 wsd__ProbeResponse->ProbeMatch[i] = &matches_.back();
             }
 
-            soap_serializeheader(this);
-            wsd__ProbeResponse->soap_serialize(this);
-            if (soap_begin_count(this))
-                return error;
+            for (int i = 0; i < 2; ++i) {
+                soap_serializeheader(this);
+                wsd__ProbeResponse->soap_serialize(this);
+                if (soap_begin_count(this))
+                    return error;
 
-            if (mode & SOAP_IO_LENGTH) {
-                if (soap_envelope_begin_out(this)
+                if (mode & SOAP_IO_LENGTH) {
+                    if (soap_envelope_begin_out(this)
+                     || soap_putheader(this)
+                     || soap_body_begin_out(this)
+                     || wsd__ProbeResponse->soap_put(this, "wsd:ProbeMatches", "")
+                     || soap_body_end_out(this)
+                     || soap_envelope_end_out(this))
+                         return error;
+                };
+                if (soap_end_count(this)
+                 || soap_response(this, SOAP_OK)
+                 || soap_envelope_begin_out(this)
                  || soap_putheader(this)
                  || soap_body_begin_out(this)
                  || wsd__ProbeResponse->soap_put(this, "wsd:ProbeMatches", "")
                  || soap_body_end_out(this)
-                 || soap_envelope_end_out(this))
-                     return error;
-            };
-            if (soap_end_count(this)
-             || soap_response(this, SOAP_OK)
-             || soap_envelope_begin_out(this)
-             || soap_putheader(this)
-             || soap_body_begin_out(this)
-             || wsd__ProbeResponse->soap_put(this, "wsd:ProbeMatches", "")
-             || soap_body_end_out(this)
-             || soap_envelope_end_out(this)
-             || soap_end_send(this))
-                return error;
+                 || soap_envelope_end_out(this)
+                 || soap_end_send(this))
+                    return error;
+            }
         }
 
 
