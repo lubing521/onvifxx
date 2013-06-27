@@ -28,6 +28,10 @@ public:
     Wsa(struct soap * soap);
     ~Wsa();
 
+    static uint & instanceId();
+    static std::string & sequenceId();
+    static uint & messageNumber();
+
     std::string randUuid();
 
     int allocHeader();
@@ -38,6 +42,7 @@ public:
     int addReplyTo(const std::string & replyTo);
     int addFaultTo(const std::string & faultTo);
     int addRelatesTo(const std::string & relatesTo);
+    int addAppSequence(std::string * id = nullptr);
 
     int reply(const std::string & id, const std::string & action);
     int request(const std::string & to, const std::string & action);
@@ -94,6 +99,7 @@ public:
 
 private:
     soap * soap_;
+    wsd__AppSequenceType sequence_;
 };
 
 #endif // ONVIFXX_WSDD_HPP

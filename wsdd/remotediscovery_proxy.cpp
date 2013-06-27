@@ -34,24 +34,6 @@ public:
         soap_done(this);
     }
 
-    static uint & instanceId()
-    {
-        static uint rv = time(nullptr);
-        return rv;
-    }
-
-    static std::string & sequenceId()
-    {
-        static std::string  rv;
-        return rv;
-    }
-
-    static uint & messageNumber()
-    {
-        static uint rv = 0;
-        ++rv;
-        return rv;
-    }
 
     static std::string toString(const char * s)
     {
@@ -75,25 +57,20 @@ public:
                 throw SoapException(this);
         }
 
-        if (soap_header()->wsd__AppSequence != nullptr) {
-            wsd__AppSequenceType * seq = soap_header()->wsd__AppSequence;
-            instanceId() = seq->InstanceId;
-            messageNumber() = seq->MessageNumber;
-            if (seq->SequenceId != nullptr)
-                sequenceId() = *seq->SequenceId;
-        }
+//        if (soap_header()->wsd__AppSequence != nullptr) {
+//            wsd__AppSequenceType * seq = soap_header()->wsd__AppSequence;
+//            instanceId() = seq->InstanceId;
+//            messageNumber() = seq->MessageNumber;
+//            if (seq->SequenceId != nullptr)
+//                sequenceId() = *seq->SequenceId;
+//        }
     }
 
     virtual void hello(const Hello_t & arg)
     {
         // Header
         wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Hello");
-
-        wsd__AppSequenceType app_sequence;
-        app_sequence.soap_default(this);
-        app_sequence.InstanceId = instanceId();
-        app_sequence.MessageNumber = messageNumber();
-        header->wsd__AppSequence = &app_sequence;
+        wsa_.addAppSequence();
 
         // Body
         Wsa::Request<wsd__HelloType> req(this, arg);
@@ -106,12 +83,7 @@ public:
     {
         // Header
         wsa_.request(TO_TS_URL, SOAP_NAMESPACE_OF_wsd"/Bye");
-
-        wsd__AppSequenceType app_sequence;
-        app_sequence.soap_default(this);
-        app_sequence.InstanceId = instanceId();
-        app_sequence.MessageNumber = messageNumber();
-        header->wsd__AppSequence = &app_sequence;
+        wsa_.addAppSequence();
 
         // Body
         Wsa::Request<wsd__ByeType> req(this, arg);

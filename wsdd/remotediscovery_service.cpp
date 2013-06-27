@@ -64,9 +64,9 @@ public:
     RemoteDiscoveryService() :
         wsa_(this)
     {
-        this->send_timeout = TIMEOUT;
-        this->recv_timeout = TIMEOUT;
-        this->accept_timeout = TIMEOUT;
+        send_timeout = TIMEOUT;
+        recv_timeout = TIMEOUT;
+        accept_timeout = TIMEOUT;
     }
 
     virtual ~RemoteDiscoveryService()
@@ -187,6 +187,7 @@ public:
             std::string relatesTo = soap_header()->wsa__MessageID;
             wsa_.request("", SOAP_NAMESPACE_OF_wsd"/ProbeMatches");
             wsa_.addRelatesTo(relatesTo);
+            wsa_.addAppSequence();
 
             // Body
             wsd__ProbeMatchesType req;

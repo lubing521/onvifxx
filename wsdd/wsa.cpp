@@ -32,9 +32,11 @@ int wsaError(soap * s, wsa__FaultSubcodeValues fault)
 
 } // anonymous namespace
 
+
 Wsa::Wsa(struct soap * soap) :
     soap_(soap)
 {
+    sequence_.soap_default(soap);
 }
 
 Wsa::~Wsa()
@@ -43,6 +45,24 @@ Wsa::~Wsa()
     soap_end(soap_);
 }
 
+uint & Wsa::instanceId()
+{
+    static uint rv = time(nullptr);
+    return rv;
+}
+
+std::string & Wsa::sequenceId()
+{
+    static std::string  rv;
+    return rv;
+}
+
+uint & Wsa::messageNumber()
+{
+    static uint rv = 0;
+    ++rv;
+    return rv;
+}
 
 std::string Wsa::randUuid()
 {
@@ -153,6 +173,14 @@ int Wsa::addRelatesTo(const std::string & relatesTo)
     return SOAP_OK;
 }
 
+int Wsa::addAppSequence(std::string * id)
+{
+    sequence_.SequenceId = id;
+    sequence_.InstanceId = instanceId();
+    sequence_.MessageNumber = messageNumber();
+    soap_->header->wsd__AppSequence = &sequence_;
+}
+
 
 int Wsa::reply(const std::string & id, const std::string & action)
 {
@@ -254,3 +282,4 @@ int Wsa::request(const std::string & to, const std::string & action)
 
     return check();
 }
+
