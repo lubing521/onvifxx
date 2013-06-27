@@ -91,7 +91,7 @@ std::string Wsa::randUuid()
 #endif
     r3 = soap_random;
     r4 = soap_random;
-    std::sprintf(rv, "urn:uuid:%8.8x-%4.4hx-4%3.3hx-%4.4hx-%4.4hx%8.8x",
+    std::sprintf(rv, "uuid:%8.8x-%4.4hx-4%3.3hx-%4.4hx-%4.4hx%8.8x",
             r1, (short)(r2 >> 16), (short)r2 >> 4,
             ((short)(r3 >> 16) & 0x3FFF) | 0x8000, (short)r3, r4);
 
